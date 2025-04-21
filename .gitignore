@@ -1,0 +1,72 @@
+# 의존성 패키지
+/node_modules
+/package-lock.json
+/yarn.lock
+
+# 환경 설정 파일
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 로그 파일
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 빌드 출력 디렉토리
+/dist
+/build
+/out
+
+# 캐시 및 임시 파일
+.cache
+.next
+.nuxt
+.tmp
+.temp
+.cache-loader
+
+# 타입스크립트 컴파일 결과
+*.tsbuildinfo
+
+# IDE/에디터 설정 파일들
+.idea
+.vscode
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# 운영체제 생성 파일
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 테스트 커버리지
+/coverage
+
+# 개발 중에 생성되는 백업 파일
+*.bak
+*.backup
+*~
+
+# 기타 일반적으로 무시하는 파일
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.history
+
+# Notion API 관련 임시 파일
+notion-cache/
+
+# 개발용 에셋 원본 파일
+/design-assets
+/mockups 

@@ -1,0 +1,34 @@
+{
+  "name": "ai-trend-finder",
+  "version": "1.0.0",
+  "description": "AI 트렌드 파인더 - 노션 데이터베이스와 연결된 블로그",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "notion",
+    "blog",
+    "ai",
+    "trends"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@mendable/firecrawl-js": "^1.24.0",
+    "@notionhq/client": "^2.2.14",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "openai": "^4.95.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.10",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
