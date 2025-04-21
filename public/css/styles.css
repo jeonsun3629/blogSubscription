@@ -337,9 +337,17 @@ header p {
     transition: all 0.3s;
 }
 
-.pagination a.next {
+.pagination a.next, .pagination a.prev {
     width: auto;
     padding: 0 1rem;
+}
+
+.pagination a.prev i {
+    margin-right: 0.3rem;
+}
+
+.pagination a.next i {
+    margin-left: 0.3rem;
 }
 
 .pagination a.active {
@@ -1168,4 +1176,30 @@ mark {
   width: 90% !important;
   margin: 0 auto !important;
   display: flex !important;
+}
+
+/* 애니메이션 효과 추가 */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* 카테고리 선택 효과 강화 */
+.category-item.active {
+    font-weight: bold;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 4px;
+    padding-left: 8px;
+    transition: all 0.3s ease;
 } 

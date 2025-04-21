@@ -359,40 +359,126 @@ document.addEventListener('DOMContentLoaded', function() {
             // 기존 카테고리 항목들 삭제
             categoryListContainer.innerHTML = '';
             
+            // 고정된 카테고리 순서 정의
+            const fixedOrder = ['모든 글 보기', '모델 업데이트', '연구 동향', '시장 동향', '개발자 도구'];
+            
+            // 카테고리를 맵 형태로 변환하여 쉽게 접근할 수 있도록 함
+            const categoryMap = {};
+            categories.forEach(category => {
+                categoryMap[category.name] = category;
+            });
+            
             // "모든 글 보기" 항목을 맨 위에 추가
             const allPostsItem = document.createElement('li');
             allPostsItem.className = 'all-posts-item';
             allPostsItem.innerHTML = `
-                <a href="#" class="category-item all-posts-link active" id="all-posts-animation-style" data-category="all">
+                <a href="#" class="category-item all-posts-link active" data-category="all">
                     <i class="fas fa-th-list"></i> 모든 글 보기
                 </a>
             `;
             categoryListContainer.appendChild(allPostsItem);
             
-            // 카테고리가 없는 경우 처리
-            if (!categories || categories.length === 0) {
-                const noCategories = document.createElement('li');
-                noCategories.innerHTML = `
-                    <p>카테고리가 없습니다.</p>
-                `;
-                categoryListContainer.appendChild(noCategories);
-                return;
+            // 고정된 순서에 따라 카테고리 추가
+            for (let i = 1; i < fixedOrder.length; i++) { // index 1부터 시작 (모든 글 보기 이미 추가됨)
+                const categoryName = fixedOrder[i];
+                const category = categoryMap[categoryName];
+                
+                if (category) {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <a href="#" class="category-item" data-category="${category.name}">
+                            <i class="fas ${category.icon}" style="color: ${category.color}"></i>
+                            ${category.name}
+                            <span id="count-${category.name.replace(/\s+/g, '-').toLowerCase()}"></span>
+                        </a>
+                    `;
+                    categoryListContainer.appendChild(listItem);
+                }
             }
             
-            // 모든 카테고리 항목 추가
+            // 정의된 고정 순서에 없는 나머지 카테고리들 추가
             categories.forEach(category => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    <a href="#" class="category-item" data-category="${category.name}">
-                        <i class="fas ${category.icon}" style="color: ${category.color}"></i>
-                        ${category.name}
-                        <span id="count-${category.name.replace(/\s+/g, '-').toLowerCase()}"></span>
-                    </a>
-                `;
-                categoryListContainer.appendChild(listItem);
+                if (!fixedOrder.includes(category.name)) {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <a href="#" class="category-item" data-category="${category.name}">
+                            <i class="fas ${category.icon}" style="color: ${category.color}"></i>
+                            ${category.name}
+                            <span id="count-${category.name.replace(/\s+/g, '-').toLowerCase()}"></span>
+                        </a>
+                    `;
+                    categoryListContainer.appendChild(listItem);
+                }
             });
             
             // 카테고리 클릭 이벤트 리스너 추가
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const categoryFilter = e.currentTarget.getAttribute('data-category');
+                    loadLatestPosts(1, categoryFilter);
+                    
+                    // 모든 카테고리 버튼 비활성화
+                    categoryItems.forEach(i => i.classList.remove('active'));
+                    
+                    // 클릭한 카테고리 활성화 및 애니메이션 효과 추가
+                    e.currentTarget.classList.add('active');
+                    
+                    // 애니메이션 효과 추가 - 버튼 기존 효과 제거 후 다시 추가하여 매번 애니메이션 재생
+                    e.currentTarget.classList.remove('animate-pulse');
+                    setTimeout(() => {
+                        e.currentTarget.classList.add('animate-pulse');
+                    }, 10);
+                    
+                    // 클릭 효과 추가
+                    console.log('카테고리 클릭:', categoryFilter);
+                });
+            });
+            
+            console.log('카테고리 목록을 성공적으로 로드했습니다.');
+        } catch (error) {
+            console.error('카테고리 목록을 가져오는 중 오류 발생:', error);
+            // 오류 발생 시 기본 카테고리 HTML에서도 동일한 애니메이션 코드 적용
+            // 기본 카테고리 표시
+            const categoryListContainer = document.querySelector('.category-list');
+            categoryListContainer.innerHTML = `
+                <li class="all-posts-item">
+                    <a href="#" class="category-item all-posts-link active" data-category="all">
+                        <i class="fas fa-th-list"></i> 모든 글 보기
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="category-item" data-category="모델 업데이트">
+                        <i class="fas fa-robot" style="color: #3498db"></i>
+                        모델 업데이트
+                        <span id="count-모델-업데이트"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="category-item" data-category="연구 동향">
+                        <i class="fas fa-microscope" style="color: #2ecc71"></i>
+                        연구 동향
+                        <span id="count-연구-동향"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="category-item" data-category="시장 동향">
+                        <i class="fas fa-chart-line" style="color: #e74c3c"></i>
+                        시장 동향
+                        <span id="count-시장-동향"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="category-item" data-category="개발자 도구">
+                        <i class="fas fa-tools" style="color: #f39c12"></i>
+                        개발자 도구
+                        <span id="count-개발자-도구"></span>
+                    </a>
+                </li>
+            `;
+            
+            // 이벤트 리스너 추가
             const categoryItems = document.querySelectorAll('.category-item');
             categoryItems.forEach(item => {
                 item.addEventListener('click', (e) => {
@@ -404,32 +490,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     categoryItems.forEach(i => i.classList.remove('active'));
                     e.currentTarget.classList.add('active');
                     
-                    // 클릭 효과 추가
-                    console.log('카테고리 클릭:', categoryFilter);
+                    // 애니메이션 효과 추가 - 매번 애니메이션이 재생되도록 함
+                    e.currentTarget.classList.remove('animate-pulse');
+                    setTimeout(() => {
+                        e.currentTarget.classList.add('animate-pulse');
+                    }, 10);
                 });
             });
-            
-            console.log('카테고리 목록을 성공적으로 로드했습니다.');
-        } catch (error) {
-            console.error('카테고리 목록을 가져오는 중 오류 발생:', error);
-            // 오류 발생 시 기본 카테고리 표시
-            const categoryListContainer = document.querySelector('.category-list');
-            categoryListContainer.innerHTML = `
-                <li class="all-posts-item">
-                    <a href="#" class="category-item all-posts-link active" id="all-posts-animation-style" data-category="all">
-                        <i class="fas fa-th-list"></i> 모든 글 보기
-                    </a>
-                </li>
-            `;
-            
-            // 이벤트 리스너 추가
-            const allPostsLink = document.querySelector('.all-posts-link');
-            if (allPostsLink) {
-                allPostsLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadLatestPosts(1, 'all');
-                });
-            }
         }
     }
 
@@ -515,6 +582,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (pagination && pagination.totalPages > 1) {
                 paginationHtml = '<div class="pagination">';
                 
+                // 이전 버튼 추가 - 현재 페이지가 1보다 클 때만 표시
+                if (pagination.currentPage > 1) {
+                    paginationHtml += `<a href="#" class="prev" data-page="${pagination.currentPage - 1}"><i class="fas fa-chevron-left"></i> 이전</a>`;
+                }
+                
+                // 페이지 번호
                 for (let i = 1; i <= pagination.totalPages; i++) {
                     if (i === pagination.currentPage) {
                         paginationHtml += `<a href="#" class="active">${i}</a>`;
@@ -523,7 +596,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                if (pagination.hasNextPage) {
+                // 다음 버튼 - 현재 페이지가 총 페이지 수보다 작을 때만 표시
+                if (pagination.currentPage < pagination.totalPages) {
                     paginationHtml += `<a href="#" class="next" data-page="${pagination.currentPage + 1}">다음 <i class="fas fa-chevron-right"></i></a>`;
                 }
                 

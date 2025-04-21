@@ -72,8 +72,11 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
             videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
           };
           
-          // 카테고리 필터링이 있는 경우 필터링 적용
-          if (!category || category === post.category) {
+          // 제목이 "제목 없음"인 포스트는 제외하고 유효한 제목이 있는 포스트만 추가
+          const hasValidTitle = post.title !== '제목 없음' && post.title.trim() !== '';
+          
+          // 카테고리 필터링이 있는 경우 필터링 적용 + 유효한 제목 확인
+          if (((!category || category === post.category) && hasValidTitle)) {
             allPosts.push(post);
           }
         } catch (error) {
