@@ -19,6 +19,7 @@
     --border-color: #e1e4e8;
     --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
+    --dev-tools-color: #f39c12;
 }
 
 * {
@@ -77,14 +78,30 @@ header h1 {
 .home-link {
     color: white;
     text-decoration: none;
-    transition: color 0.3s, transform 0.3s;
+    transition: all 0.3s ease;
     display: inline-block;
+    position: relative;
 }
 
 .home-link:hover {
-    color: rgba(255, 255, 255, 0.9);
-    transform: scale(1.02);
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 1);
+    transform: scale(1.03);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.home-link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease;
+}
+
+.home-link:hover::after {
+    width: 100%;
 }
 
 header p {
@@ -251,32 +268,6 @@ header p {
     font-size: 0.9rem;
 }
 
-/* 카테고리별 스타일 (JavaScript에서도 동적으로 적용되지만, 직접 정의도 가능) */
-.category-model-update {
-    background-color: rgba(52, 152, 219, 0.15);
-    color: #3498db;
-}
-
-.category-research {
-    background-color: rgba(46, 204, 113, 0.15);
-    color: #2ecc71;
-}
-
-.category-market {
-    background-color: rgba(231, 76, 60, 0.15);
-    color: #e74c3c;
-}
-
-.category-dev-tools {
-    background-color: rgba(243, 156, 18, 0.15);
-    color: #f39c12;
-}
-
-.category-default {
-    background-color: rgba(149, 165, 166, 0.15);
-    color: #95a5a6;
-}
-
 /* 카테고리 태그 호버 효과 */
 .article-category:hover {
     transform: scale(1.05);
@@ -419,8 +410,12 @@ header p {
 .category-item span {
     margin-left: auto;
     font-size: 0.85rem;
-    color: var(--text-light);
+    color: transparent !important;
     font-weight: normal;
+    background-color: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    display: inline !important;
 }
 
 /* 일반 카테고리 항목 호버 */
@@ -1035,6 +1030,29 @@ footer {
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.results-count p {
+    margin: 0;
+}
+
+.back-to-all {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.back-to-all:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+    transform: translateY(-2px);
 }
 
 .no-results {
@@ -1053,6 +1071,10 @@ footer {
 }
 
 .no-results p:last-child {
+    margin-top: 1rem;
+}
+
+.no-results p:not(:first-child) {
     color: var(--text-color);
     font-size: 0.95rem;
 }
@@ -1088,17 +1110,22 @@ mark {
 /* 모든 글 보기 링크 스타일 */
 .all-posts-link {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0 auto;
     width: 90%;
+    padding: 0.8rem !important;
+    font-weight: 600 !important;
     border-radius: 6px !important;
-    background: transparent !important;
     border-left: 4px solid var(--primary-color) !important;
+    background-color: transparent !important;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease !important;
     z-index: 1;
 }
 
-.all-posts-link::after {
+.all-posts-link::before {
     content: "";
     position: absolute;
     top: 0;
@@ -1106,7 +1133,7 @@ mark {
     width: 100%;
     height: 100%;
     background-color: rgba(52, 152, 219, 0.2);
-    transition: left 0.4s ease;
+    transition: all 0.4s cubic-bezier(0.42, 0, 0.58, 1);
     z-index: -1;
 }
 
@@ -1115,7 +1142,7 @@ mark {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
 }
 
-.all-posts-link:hover::after {
+.all-posts-link:hover::before {
     left: 0;
 }
 
@@ -1125,57 +1152,15 @@ mark {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-.all-posts-link.active::after {
-    left: -100%;
-}
-
-/* 모든 글 보기 애니메이션 스타일 */
-#all-posts-animation-style {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  z-index: 0;
-}
-
-#all-posts-animation-style::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(52, 152, 219, 0.2);
-  transition: left 0.4s ease;
-  z-index: -1;
-}
-
-#all-posts-animation-style:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-#all-posts-animation-style:hover::before {
-  left: 0;
+.all-posts-link.active::before {
+    left: -100%; /* 활성화 상태에서는 애니메이션 숨김 */
 }
 
 .all-posts-item {
-  margin-bottom: 1.2rem !important;
-  text-align: center !important;
-  padding: 0.5rem 0 !important;
-  border-bottom: 1px solid var(--border-color) !important;
-}
-
-.all-posts-item .category-item {
-  justify-content: center !important;
-  font-weight: 600 !important;
-  padding: 0.8rem !important;
-  border-left: 4px solid var(--primary-color) !important;
-  background-color: transparent !important;
-  transition: all 0.3s ease !important;
-  border-radius: 4px !important;
-  width: 90% !important;
-  margin: 0 auto !important;
-  display: flex !important;
+    margin-bottom: 1.5rem !important;
+    text-align: center !important;
+    padding: 0.5rem 0 !important;
+    border-bottom: 1px solid var(--border-color) !important;
 }
 
 /* 애니메이션 효과 추가 */
@@ -1202,4 +1187,29 @@ mark {
     border-radius: 4px;
     padding-left: 8px;
     transition: all 0.3s ease;
+}
+
+/* 상세 페이지 카테고리 스타일 */
+.post-detail .post-category,
+.post-detail [class*="category"],
+.post-detail .category {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+/* 블로그 포스트 상세 페이지의 모든 카테고리 라벨 스타일 */
+.post-meta span, 
+.post-detail .post-category,
+.post-detail .category,
+span.category {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
 } 

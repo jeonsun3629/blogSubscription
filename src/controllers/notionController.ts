@@ -17,8 +17,8 @@ const databaseId = process.env.NOTION_DATABASE_ID || '';
 const TITLE_PROPERTY = process.env.NOTION_TITLE_PROPERTY || 'Title';
 const DATE_PROPERTY = process.env.NOTION_DATE_PROPERTY || 'Date';
 const CATEGORY_PROPERTY = process.env.NOTION_CATEGORY_PROPERTY || 'Category';
-const EXCERPT_PROPERTY = process.env.NOTION_EXCERPT_PROPERTY || 'Content_kr';
-const CONTENT_FULL_PROPERTY = process.env.NOTION_CONTENT_FULL_PROPERTY || 'Content_full';
+const EXCERPT_PROPERTY = process.env.NOTION_EXCERPT_PROPERTY || 'Summary_kr';
+const CONTENT_FULL_PROPERTY = process.env.NOTION_CONTENT_FULL_PROPERTY || 'Content_full_kr';
 const IMAGE_URL_PROPERTY = process.env.NOTION_IMAGE_URL_PROPERTY || 'Image_URL';
 const VIDEO_URL_PROPERTY = process.env.NOTION_VIDEO_URL_PROPERTY || 'Video_URL';
 
@@ -55,18 +55,33 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
           const postCategory = pageObj.properties[CATEGORY_PROPERTY]?.select?.name || '분류 없음';
           console.log('Post category found:', postCategory);
           
+          // 요약(Summary_kr) 필드 디버깅
+          console.log('Excerpt property path:', EXCERPT_PROPERTY);
+          console.log('Excerpt value:', JSON.stringify(pageObj.properties[EXCERPT_PROPERTY], null, 2));
+          
           // 카테고리 카운트 동적 관리
           if (!categoryCounts[postCategory]) {
             categoryCounts[postCategory] = 0;
           }
           categoryCounts[postCategory]++;
           
+          // rich_text 필드에서 데이터 추출 방법 개선
+          let excerptText = '이 포스트에 대한 요약이 없습니다.';
+          const excerptProperty = pageObj.properties[EXCERPT_PROPERTY];
+          
+          if (excerptProperty && excerptProperty.rich_text && excerptProperty.rich_text.length > 0) {
+            excerptText = excerptProperty.rich_text[0].plain_text || excerptText;
+            console.log('Found excerpt text:', excerptText);
+          } else if (excerptProperty) {
+            console.log('Excerpt property structure:', JSON.stringify(excerptProperty, null, 2));
+          }
+          
           const post: NotionPost = {
             id: pageObj.id,
             title: pageObj.properties[TITLE_PROPERTY]?.title[0]?.plain_text || '제목 없음',
             date: pageObj.properties[DATE_PROPERTY]?.date?.start || pageObj.created_time || null,
             category: postCategory,
-            excerpt: pageObj.properties[EXCERPT_PROPERTY]?.rich_text?.[0]?.plain_text || '',
+            excerpt: excerptText,
             content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
             imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
             videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
@@ -130,13 +145,29 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
     // 타입 캐스팅
     const pageObj = postInfo as any;
     
+    // 디버깅: 포스트 속성 확인
+    console.log('Post properties:', Object.keys(pageObj.properties));
+    console.log('Excerpt property:', EXCERPT_PROPERTY);
+    console.log('Excerpt data:', JSON.stringify(pageObj.properties[EXCERPT_PROPERTY], null, 2));
+    
+    // rich_text 필드에서 데이터 추출 방법 개선
+    let excerptText = '이 포스트에 대한 요약이 없습니다.';
+    const excerptProperty = pageObj.properties[EXCERPT_PROPERTY];
+    
+    if (excerptProperty && excerptProperty.rich_text && excerptProperty.rich_text.length > 0) {
+      excerptText = excerptProperty.rich_text[0].plain_text || excerptText;
+      console.log('Found excerpt text for single post:', excerptText);
+    } else if (excerptProperty) {
+      console.log('Single post excerpt property structure:', JSON.stringify(excerptProperty, null, 2));
+    }
+    
     // 포스트 데이터 처리
     const post: NotionPostDetail = {
       id: pageObj.id,
       title: pageObj.properties[TITLE_PROPERTY]?.title[0]?.plain_text || '제목 없음',
       date: new Date(pageObj.properties[DATE_PROPERTY]?.date?.start || pageObj.created_time || Date.now()).toLocaleDateString('ko-KR'),
       category: pageObj.properties[CATEGORY_PROPERTY]?.select?.name || '분류 없음',
-      excerpt: pageObj.properties[EXCERPT_PROPERTY]?.rich_text?.[0]?.plain_text || '',
+      excerpt: excerptText,
       content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
       imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
       videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
@@ -325,12 +356,14 @@ export const searchPosts = async (req: Request, res: Response): Promise<void> =>
           // 포스트 데이터 추출
           const title = pageObj.properties[TITLE_PROPERTY]?.title[0]?.plain_text || '';
           const excerpt = pageObj.properties[EXCERPT_PROPERTY]?.rich_text?.[0]?.plain_text || '';
+          const content_full = pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '';
           const category = pageObj.properties[CATEGORY_PROPERTY]?.select?.name || '분류 없음';
           
           // 제목, 내용, 카테고리에서 검색어 포함 여부 확인 (대소문자 구분 없이)
           if (
             title.toLowerCase().includes(searchQuery) || 
             excerpt.toLowerCase().includes(searchQuery) ||
+            content_full.toLowerCase().includes(searchQuery) ||
             category.toLowerCase().includes(searchQuery)
           ) {
             const post: NotionPost = {
@@ -339,7 +372,7 @@ export const searchPosts = async (req: Request, res: Response): Promise<void> =>
               date: pageObj.properties[DATE_PROPERTY]?.date?.start || pageObj.created_time || null,
               category: category,
               excerpt: excerpt,
-              content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
+              content_full: content_full,
               imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
               videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
             };

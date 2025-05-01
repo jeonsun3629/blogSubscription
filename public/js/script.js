@@ -78,6 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 articlesContainer.innerHTML = '<div class="loading"><p>검색 결과를 불러오는 중입니다...</p></div>';
             }
             
+            // 섹션 타이틀 업데이트
+            const sectionTitle = document.querySelector('.articles-section h2');
+            if (sectionTitle) {
+                sectionTitle.innerHTML = `"${searchTerm}" 검색 중... <span class="section-divider"></span>`;
+            }
+            
             // API 호출
             const url = `/api/search?q=${encodeURIComponent(searchTerm)}`;
             console.log('요청 URL:', url);
@@ -123,13 +129,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="no-results">
                     <p>"${searchTerm}"에 대한 검색 결과가 없습니다.</p>
                     <p>다른 키워드로 검색해 보세요.</p>
+                    <p><a href="#" class="back-to-all" onclick="loadLatestPosts(1, 'all'); return false;">모든 글 보기</a></p>
                 </div>
             `;
             return;
         }
         
         // 검색 결과 표시
-        let resultsHTML = `<p class="results-count">총 ${data.total}개의 결과</p>`;
+        let resultsHTML = `
+            <div class="results-count">
+                <p>총 ${data.total}개의 결과</p>
+                <p><a href="#" class="back-to-all" onclick="loadLatestPosts(1, 'all'); return false;">모든 글 보기</a></p>
+            </div>
+        `;
         
         data.results.forEach(post => {
             const categoryStyle = getCategoryStyle(post.category);
@@ -161,6 +173,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 카드 애니메이션 적용
         applyCardHoverEffects();
+        
+        // 카테고리 필터 초기화 - 검색 결과를 보여줄 때 모든 필터링 해제
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // '모든 글 보기' 버튼 스타일링
+        document.querySelector('.back-to-all')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            // '모든 글 보기' 카테고리 항목 활성화
+            document.querySelector('.category-item[data-category="all"]')?.classList.add('active');
+            loadLatestPosts(1, 'all');
+        });
     }
     
     // 검색어 하이라이트 함수
@@ -324,6 +349,65 @@ document.addEventListener('DOMContentLoaded', function() {
         if (postId) {
             loadPostContent(postId);
         }
+    }
+
+    // 상세 페이지 카테고리 스타일 적용
+    if (window.location.pathname.startsWith('/post/')) {
+        stylePostDetailCategories();
+    }
+
+    // 카테고리 스타일 적용하는 함수
+    function stylePostDetailCategories() {
+        // 카테고리별 스타일 정의
+        const categoryStyles = {
+            '모델 업데이트': {
+                bgColor: 'rgba(52, 152, 219, 0.15)',
+                color: '#3498db'
+            },
+            '연구 동향': {
+                bgColor: 'rgba(46, 204, 113, 0.15)',
+                color: '#2ecc71'
+            },
+            '시장 동향': {
+                bgColor: 'rgba(231, 76, 60, 0.15)',
+                color: '#e74c3c'
+            },
+            '개발자 도구': {
+                bgColor: 'rgba(243, 156, 18, 0.15)',
+                color: '#f39c12'
+            }
+        };
+        
+        // 공통 스타일 속성
+        const commonStyles = {
+            padding: '0.3rem 0.8rem',
+            borderRadius: '20px',
+            fontWeight: '500',
+            display: 'inline-flex',
+            alignItems: 'center'
+        };
+        
+        // 모든 span 요소 순회
+        const allSpans = document.querySelectorAll('span');
+        allSpans.forEach(span => {
+            const spanText = span.textContent || '';
+            
+            // 카테고리 매칭
+            for (const [category, style] of Object.entries(categoryStyles)) {
+                if (spanText.includes(category)) {
+                    // 배경색과 텍스트 색상 적용
+                    span.style.backgroundColor = style.bgColor;
+                    span.style.color = style.color;
+                    
+                    // 공통 스타일 적용
+                    for (const [prop, value] of Object.entries(commonStyles)) {
+                        span.style[prop] = value;
+                    }
+                    
+                    break; // 일치하는 카테고리를 찾으면 루프 종료
+                }
+            }
+        });
     }
 
     // 카테고리에 따른 스타일과 아이콘 반환 함수
@@ -648,6 +732,17 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadPostContent(postId) {
         const postContainer = document.getElementById('post-content');
         
+        // 배경색 가져오는 헬퍼 함수
+        function getBackgroundColor(category) {
+            switch(category.trim()) {
+                case '모델 업데이트': return 'rgba(52, 152, 219, 0.15)';
+                case '연구 동향': return 'rgba(46, 204, 113, 0.15)';
+                case '시장 동향': return 'rgba(231, 76, 60, 0.15)';
+                case '개발자 도구': return 'rgba(243, 156, 18, 0.15)';
+                default: return 'rgba(149, 165, 166, 0.15)';
+            }
+        }
+        
         try {
             const response = await fetch(`/api/posts/${postId}`);
             
@@ -677,7 +772,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h1>${post.title}</h1>
                 <div class="post-meta">
                     <span class="post-date">${post.date}</span>
-                    <span class="post-category category-${categoryStyle.name.replace(/\s+/g, '-').toLowerCase()}">
+                    <span class="post-category" 
+                          style="background-color:${getBackgroundColor(post.category)}; color:${categoryStyle.color}; padding:0.3rem 0.8rem; border-radius:20px; font-weight:500; display:inline-flex; align-items:center;">
                         <i class="fas ${categoryStyle.icon}"></i> ${categoryStyle.name}
                     </span>
                 </div>
