@@ -1,0 +1,62 @@
+/* 글로벌 CSS 변수 정의 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+:root {
+    /* 색상 변수 */
+    --primary-color: #3498db;
+    --primary-color-light: rgba(52, 152, 219, 0.15);
+    --primary-color-dark: #2980b9;
+    --secondary-color: #2ecc71;
+    --secondary-color-dark: #27ae60;
+    --dark-color: #2c3e50;
+    --light-color: #ecf0f1;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --info-color: #1abc9c;
+    --success-color: #27ae60;
+    
+    /* 텍스트 색상 */
+    --text-color: #333;
+    --text-light: #666;
+    --text-white: #fff;
+    --text-muted: rgba(255, 255, 255, 0.7);
+    
+    /* 배경 색상 */
+    --body-bg: #f5f5f7;
+    --card-bg: #fff;
+    
+    /* 테두리 및 그림자 */
+    --border-color: #e1e4e8;
+    --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --box-shadow-hover: 0 10px 20px rgba(0, 0, 0, 0.15);
+    
+    /* 트랜지션 및 애니메이션 */
+    --transition: all 0.3s ease;
+    --transition-fast: all 0.2s ease;
+    --transition-slow: all 0.4s ease;
+    
+    /* 레이아웃 */
+    --container-width: 1200px;
+    --grid-gap: 2rem;
+    --sidebar-width: 350px;
+    
+    /* 간격 */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem; 
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* 반경 */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-round: 20px;
+    --radius-circle: 50%;
+    
+    /* 기타 */
+    --dev-tools-color: #f39c12;
+    --z-index-header: 1000;
+    --z-index-menu: 900;
+    --z-index-top: 999;
+} 

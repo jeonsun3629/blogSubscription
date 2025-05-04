@@ -1,0 +1,97 @@
+/* CTA(Call to Action) 섹션 스타일 */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+}
+
+.cta-section h2 {
+    color: white;
+    margin-bottom: var(--spacing-sm);
+    font-size: 2rem;
+}
+
+.cta-section p {
+    margin-bottom: var(--spacing-lg);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+}
+
+.cta-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.cta-form input {
+    padding: 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+}
+
+.cta-form input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.cta-form button {
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.cta-form button:hover {
+    background-color: var(--secondary-color-dark);
+    transform: translateY(-2px);
+}
+
+.cta-form button:active {
+    transform: translateY(0);
+}
+
+.form-footer {
+    margin-top: var(--spacing-sm);
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+/* 애니메이션 효과 */
+.cta-section.slide-in {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.cta-pulse {
+    animation: pulse 2s infinite;
+}
+
+/* 반응형 조정 */
+@media (max-width: 767px) {
+    .cta-section {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .cta-section h2 {
+        font-size: 1.6rem;
+    }
+    
+    .cta-form {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .cta-form input,
+    .cta-form button {
+        padding: 0.8rem;
+    }
+} 

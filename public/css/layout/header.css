@@ -1,0 +1,88 @@
+/* 헤더 레이아웃 스타일 */
+header {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    padding: var(--spacing-md) 0;
+    box-shadow: var(--box-shadow);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-index-header);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+/* 헤더 홈 링크 스타일 */
+.home-link {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.home-link:hover {
+    color: rgba(255, 255, 255, 1);
+    transform: scale(1.03);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.home-link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease;
+}
+
+.home-link:hover::after {
+    width: 100%;
+}
+
+header p {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* 반응형 헤더 */
+@media (max-width: 767px) {
+    header {
+        padding: var(--spacing-sm) 0;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        position: relative;
+        gap: var(--spacing-xs);
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .menu-toggle {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+}
+
+@media (max-width: 575px) {
+    header h1 {
+        font-size: 1.6rem;
+    }
+} 

@@ -9,6 +9,7 @@ export interface NotionPost {
   content_full?: string;
   imageUrl?: string;
   videoUrl?: string;
+  clickCount?: number;
 }
 
 export interface NotionPostDetail extends NotionPost {

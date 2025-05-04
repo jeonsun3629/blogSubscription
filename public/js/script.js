@@ -804,16 +804,25 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 원문 콘텐츠 표시 (content_full이 있으면 사용)
             if (post.content_full && post.content_full.trim() !== '') {
+                // 불릿포인트에 대한 줄바꿈 처리
+                let formattedContent = post.content_full;
+                
+                // • 문자 주변에 줄바꿈 추가 (이미 줄바꿈 되어 있지 않은 경우에만)
+                formattedContent = formattedContent.replace(/([^\n])•/g, '$1\n\n•');
+                
                 postHtml += `
                 <div class="post-content">
-                    ${post.content_full.replace(/\n/g, '<br>')}
+                    ${formattedContent.replace(/\n/g, '<br>')}
                 </div>
                 `;
             } else {
                 // 원문이 없는 경우 블록 콘텐츠 처리
                 postHtml += `<div class="post-content">`;
                 
-                post.content.forEach(block => {
+                // 불릿 포인트 아이템이 있는지 확인하고 필요한 경우 ul 요소 열기
+                let inBulletedList = false;
+                
+                post.content.forEach((block, index) => {
                     // 빈 텍스트는 건너뜀
                     if (!block.text || block.text.trim() === '') return;
                     
@@ -833,21 +842,54 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     switch (block.type) {
                         case 'paragraph':
+                            // 만약 불릿 리스트 중이었다면 닫기
+                            if (inBulletedList) {
+                                postHtml += `</ul>`;
+                                inBulletedList = false;
+                            }
                             postHtml += `<p>${block.text}</p>`;
                             break;
                         case 'heading_1':
+                            if (inBulletedList) {
+                                postHtml += `</ul>`;
+                                inBulletedList = false;
+                            }
                             postHtml += `<h1>${block.text}</h1>`;
                             break;
                         case 'heading_2':
+                            if (inBulletedList) {
+                                postHtml += `</ul>`;
+                                inBulletedList = false;
+                            }
                             postHtml += `<h2>${block.text}</h2>`;
                             break;
                         case 'heading_3':
+                            if (inBulletedList) {
+                                postHtml += `</ul>`;
+                                inBulletedList = false;
+                            }
                             postHtml += `<h3>${block.text}</h3>`;
                             break;
                         case 'bulleted_list_item':
+                            // 불릿 리스트가 시작되지 않았다면 ul 태그 열기
+                            if (!inBulletedList) {
+                                postHtml += `<ul class="bulleted-list">`;
+                                inBulletedList = true;
+                            }
                             postHtml += `<li>${block.text}</li>`;
+                            
+                            // 다음 블록이 불릿 리스트가 아니거나 마지막 블록이면 ul 태그 닫기
+                            const nextBlock = index < post.content.length - 1 ? post.content[index + 1] : null;
+                            if (!nextBlock || nextBlock.type !== 'bulleted_list_item') {
+                                postHtml += `</ul>`;
+                                inBulletedList = false;
+                            }
                             break;
                         case 'image':
+                            if (inBulletedList) {
+                                postHtml += `</ul>`;
+                                inBulletedList = false;
+                            }
                             // 이미지 URL이 example로 시작하지 않는 경우에만 표시
                             if (block.url && !block.url.startsWith('example') && !block.url.includes('example.com')) {
                                 postHtml += `<img src="${block.url}" alt="포스트 이미지">`;
@@ -855,6 +897,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             break;
                     }
                 });
+                
+                // 혹시 불릿 리스트가 닫히지 않았으면 닫아줌
+                if (inBulletedList) {
+                    postHtml += `</ul>`;
+                }
                 
                 postHtml += `</div>`;
             }
@@ -875,6 +922,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // 페이지 타이틀 업데이트
             document.title = `${post.title} - AI 트렌드 파인더`;
             
+            // 불릿 포인트 스타일링 적용
+            applyBulletPointStyling();
+            
+            // 페이지 로드 시 자동으로 클릭 이벤트 추적
+            await trackPostClick(postId);
+            
         } catch (error) {
             console.error('포스트를 가져오는 중 오류 발생:', error);
             postContainer.innerHTML = `
@@ -886,4 +939,164 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     }
-}); 
+
+    // 불릿 포인트 스타일링 적용 함수
+    function applyBulletPointStyling() {
+        // 모든 포스트 컨텐츠 p 태그 확인
+        const paragraphs = document.querySelectorAll('.post-content p');
+        
+        paragraphs.forEach(p => {
+            const html = p.innerHTML;
+            
+            // • 문자가 포함된 단락 찾기
+            if (html.includes('•')) {
+                // 클래스 추가
+                p.classList.add('bullet-point-paragraph');
+                
+                // • 문자를 기준으로 텍스트 분할 후 다시 조합
+                const parts = html.split('•');
+                
+                if (parts.length > 1) {
+                    let newHtml = parts[0]; // 첫 부분은 그대로 유지
+                    
+                    // 불릿 포인트 부분에 스타일 적용하여 재조합
+                    for (let i = 1; i < parts.length; i++) {
+                        newHtml += '<br><br>• ' + parts[i];
+                    }
+                    
+                    p.innerHTML = newHtml;
+                }
+            }
+        });
+    }
+
+    // 인기 포스트 로드
+    loadPopularPosts();
+});
+
+// 인기 포스트 로드 함수
+async function loadPopularPosts() {
+    try {
+        const popularPostsContainer = document.querySelector('.popular-posts');
+        if (!popularPostsContainer) return;
+
+        // 로딩 상태 표시
+        popularPostsContainer.innerHTML = '<li class="loading-popular-posts"><p>인기 포스트를 불러오는 중입니다...</p></li>';
+        
+        // 인기 포스트 데이터 가져오기 (캐시 방지 쿼리 파라미터 추가)
+        const cacheBuster = new Date().getTime();
+        console.log('인기 포스트 데이터 요청 중...');
+        const response = await fetch(`/api/popular-posts?_=${cacheBuster}`, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`인기 포스트를 가져오는 중 오류가 발생했습니다: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('인기 포스트 데이터 수신됨:', data);
+        
+        // 포스트가 없는 경우
+        if (!data.posts || data.posts.length === 0) {
+            console.log('인기 포스트 데이터가 없습니다');
+            popularPostsContainer.innerHTML = '<li class="no-popular-posts"><p>아직 인기 포스트가 없습니다.</p></li>';
+            return;
+        }
+        
+        // 인기 포스트 목록 생성
+        let postsHTML = '';
+        
+        data.posts.forEach(post => {
+            const formattedDate = post.date ? new Date(post.date).toLocaleDateString('ko-KR') : '';
+            
+            // 클릭 카운트 처리 - 명시적 타입 변환 및 디버깅
+            let clickCount = 0;
+            
+            // 클릭 카운트 로직 개선 - 수신된 데이터 로깅
+            console.log(`포스트 '${post.title}'의 원본 클릭 카운트:`, post.clickCount, `(타입: ${typeof post.clickCount})`);
+            
+            if (post.clickCount !== undefined && post.clickCount !== null) {
+                // 문자열 또는 다른 타입에서 숫자로 명시적 변환
+                clickCount = Number(post.clickCount);
+                
+                // NaN 체크
+                if (isNaN(clickCount)) {
+                    console.log(`포스트 '${post.title}'의 클릭 카운트가 유효한 숫자가 아닙니다. 0으로 설정합니다.`);
+                    clickCount = 0;
+                }
+            }
+            
+            console.log(`포스트 '${post.title}'의 최종 클릭 카운트:`, clickCount);
+            
+            postsHTML += `
+                <li>
+                    <a href="/post/${post.id}" onclick="trackPostClick('${post.id}')">
+                        <span class="post-title">${post.title}</span>
+                        <div class="post-meta">
+                            <span class="post-date">${formattedDate}</span>
+                            <span class="post-clicks"><i class="fas fa-eye"></i>&nbsp;${clickCount}회</span>
+                        </div>
+                    </a>
+                </li>
+            `;
+        });
+        
+        popularPostsContainer.innerHTML = postsHTML;
+        
+        // 인기 포스트인지 최신 포스트인지 표시
+        const popularPostsTitle = document.querySelector('.sidebar-widget h3');
+        if (popularPostsTitle && data.isLatest) {
+            popularPostsTitle.innerHTML = '최신 포스트 <span class="badge">NEW</span>';
+        } else if (popularPostsTitle) {
+            popularPostsTitle.innerHTML = '인기 포스트 <span class="badge">HOT</span>';
+        }
+    } catch (error) {
+        console.error('인기 포스트를 로드하는 중 오류 발생:', error);
+        
+        const popularPostsContainer = document.querySelector('.popular-posts');
+        if (popularPostsContainer) {
+            popularPostsContainer.innerHTML = '<li class="error-message"><p>인기 포스트를 불러오는 중 오류가 발생했습니다.</p></li>';
+        }
+    }
+}
+
+// 포스트 클릭 추적 함수
+async function trackPostClick(postId) {
+    try {
+        console.log(`포스트 클릭 추적 시작: ${postId}`);
+        
+        // 클릭 이벤트 추적 API 호출
+        const response = await fetch(`/api/posts/${postId}/track-click`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('클릭 이벤트 추적 실패:', response.status, response.statusText);
+            const errorText = await response.text();
+            console.error('오류 상세:', errorText);
+        } else {
+            const result = await response.json();
+            console.log('클릭 이벤트 추적 성공:', result);
+            
+            // 즉시 인기 포스트 새로고침 (지연 없이)
+            if (document.querySelector('.popular-posts')) {
+                console.log('인기 포스트 목록 새로고침');
+                loadPopularPosts();
+            }
+        }
+    } catch (error) {
+        // 클릭 추적 실패해도 사용자 경험에 영향을 주지 않도록 조용히 처리
+        console.error('클릭 이벤트 추적 중 오류:', error);
+    }
+    
+    // 기본 네비게이션은 계속 진행
+    return true;
+} 

@@ -1,0 +1,57 @@
+/* 스크롤 투 탑 버튼 */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-circle);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    z-index: var(--z-index-top);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-3px);
+}
+
+.scroll-to-top:active {
+    transform: translateY(-1px);
+}
+
+/* 반응형 조정 */
+@media (max-width: 767px) {
+    .scroll-to-top {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+        right: 20px;
+        bottom: 20px;
+    }
+}
+
+@media (max-width: 575px) {
+    .scroll-to-top {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        right: 15px;
+        bottom: 15px;
+    }
+} 

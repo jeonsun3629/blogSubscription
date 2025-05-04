@@ -15,4 +15,10 @@ router.get('/api/categories', notionController.getCategories);
 // 제목, 내용 등으로 포스트 검색하기
 router.get('/api/search', notionController.searchPosts);
 
+// 인기 포스트 가져오기 (최근 1주일 간 가장 많이 클릭된 포스트)
+router.get('/api/popular-posts', notionController.getPopularPosts);
+
+// 포스트 클릭 이벤트 추적
+router.post('/api/posts/:postId/track-click', notionController.trackPostClick);
+
 export default router; 

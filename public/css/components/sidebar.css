@@ -1,0 +1,137 @@
+/* 사이드바 위젯 */
+.sidebar-widget {
+    background: var(--section-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.sidebar-widget:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-widget h3 {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-widget h3 .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: var(--accent-color);
+    color: white;
+    margin-left: 8px;
+}
+
+.sidebar-widget h3 .badge.hot {
+    background: var(--accent-color);
+}
+
+.sidebar-widget h3 .badge.new {
+    background: #4caf50;
+}
+
+/* 인기 포스트 목록 */
+.popular-posts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.popular-posts li {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.popular-posts li:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.popular-posts a {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.popular-posts a:hover {
+    color: var(--accent-color);
+}
+
+.popular-posts .post-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+.popular-posts .post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.popular-posts .post-date {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.popular-posts .post-clicks {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.popular-posts .post-clicks i {
+    margin-right: 4px;
+    font-size: 0.75rem;
+}
+
+/* 로딩 및 오류 상태 */
+.loading-popular-posts,
+.no-popular-posts,
+.error-message {
+    text-align: center;
+    padding: 15px 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.loading-popular-posts:before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-left-color: var(--accent-color);
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+} 

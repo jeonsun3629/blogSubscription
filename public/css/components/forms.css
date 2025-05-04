@@ -1,0 +1,192 @@
+/* 폼 컴포넌트 */
+
+/* 기본 폼 스타일 */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+.form-text {
+    font-size: 0.85rem;
+    margin-top: var(--spacing-xs);
+    color: var(--text-light);
+}
+
+/* 체크박스 및 라디오 */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.form-check-input {
+    margin-right: var(--spacing-xs);
+}
+
+.form-check-label {
+    font-size: 1rem;
+}
+
+/* 인라인 폼 */
+.form-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* 폼 행 */
+.form-row {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.form-row > * {
+    flex: 1;
+}
+
+/* 구독 폼 */
+.subscribe-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.subscribe-form input {
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+.subscribe-form button {
+    padding: 0.8rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.subscribe-form button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* CTA 폼 */
+.cta-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.cta-form input {
+    padding: 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+}
+
+.cta-form button {
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cta-form button:hover {
+    background-color: var(--secondary-color-dark);
+}
+
+.form-footer {
+    margin-top: var(--spacing-sm);
+    opacity: 0.8;
+}
+
+/* 검증 스타일 */
+.is-valid {
+    border-color: var(--success-color) !important;
+}
+
+.is-invalid {
+    border-color: var(--danger-color) !important;
+}
+
+.valid-feedback {
+    color: var(--success-color);
+    font-size: 0.85rem;
+    margin-top: var(--spacing-xs);
+}
+
+.invalid-feedback {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: var(--spacing-xs);
+}
+
+/* 커스텀 셀렉트 */
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    appearance: none;
+    background-color: var(--card-bg);
+    cursor: pointer;
+}
+
+.custom-select::after {
+    content: "\25BC";
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 0.8rem;
+}
+
+/* 반응형 조정 */
+@media (max-width: 767px) {
+    .form-row {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .cta-form {
+        padding: 0 var(--spacing-sm);
+    }
+} 

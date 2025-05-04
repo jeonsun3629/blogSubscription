@@ -1,0 +1,126 @@
+/* 모델 섹션 스타일 */
+#models {
+    background-color: var(--card-bg);
+    padding: var(--spacing-xl) 0;
+}
+
+.models-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.models-header h2 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.models-header p {
+    color: var(--text-light);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+.model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.model-card {
+    background: var(--light-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.model-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.model-card:hover {
+    box-shadow: var(--box-shadow-hover);
+    transform: translateY(-5px);
+}
+
+.model-card:hover::after {
+    transform: scaleX(1);
+}
+
+.model-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+}
+
+.model-card h3 i {
+    margin-right: var(--spacing-md);
+}
+
+.model-card p {
+    color: var(--text-light);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.7;
+}
+
+.model-card .metrics {
+    font-weight: 500;
+    color: var(--primary-color);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+}
+
+.model-cta {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+}
+
+.model-cta .btn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* 태블릿 및 모바일 반응형 */
+@media (max-width: 991px) {
+    .model-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 767px) {
+    #models {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .models-header h2 {
+        font-size: 1.6rem;
+    }
+    
+    .model-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .model-card {
+        padding: var(--spacing-sm);
+    }
+} 

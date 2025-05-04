@@ -95,6 +95,34 @@
             margin-bottom: 1.5rem;
         }
         
+        /* 불릿포인트 스타일 추가 */
+        .post-content li {
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .post-content li::marker {
+            font-weight: bold;
+        }
+        
+        /* 불릿 리스트 클래스 스타일 추가 */
+        .post-content .bulleted-list {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+        
+        .post-content .bulleted-list li {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        /* • 문자가 있는 텍스트에 대한 스타일 */
+        .post-content p:has(br + •),
+        .post-content p:contains("•") {
+            display: block;
+            margin-top: 1rem;
+        }
+        
         .post-content h1 {
             font-size: 1.8rem;
             margin: 2rem 0 1rem;
@@ -200,6 +228,13 @@
             width: 100%;
             height: 100%;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 불릿 포인트 p 태그 스타일 (JavaScript로 클래스 추가) */
+        .post-content .bullet-point-paragraph {
+            display: block;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>

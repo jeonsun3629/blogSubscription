@@ -1,0 +1,219 @@
+/* 카테고리 컴포넌트 - 모든 카테고리 스타일 통합 */
+
+/* 기본 카테고리 스타일 */
+.category {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-round);
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: var(--transition);
+    color: var(--text-color);
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.category i {
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* 카테고리 크기 */
+.category.category-sm {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+.category.category-lg {
+    padding: 0.4rem 1rem;
+    font-size: 0.95rem;
+}
+
+/* 호버 효과 */
+.category:hover {
+    transform: scale(1.05);
+    background-color: var(--primary-color-light);
+}
+
+/* 색상 바리에이션 */
+.category.category-primary {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.category.category-secondary {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: var(--secondary-color);
+}
+
+.category.category-info {
+    background-color: rgba(26, 188, 156, 0.15);
+    color: var(--info-color);
+}
+
+.category.category-warning {
+    background-color: rgba(243, 156, 18, 0.15);
+    color: var(--warning-color);
+}
+
+.category.category-danger {
+    background-color: rgba(231, 76, 60, 0.15); 
+    color: var(--danger-color);
+}
+
+.category.category-light {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--text-color);
+}
+
+.category.category-dark {
+    background-color: rgba(44, 62, 80, 0.15);
+    color: var(--dark-color);
+}
+
+/* 카테고리 아이템 (사이드바 카테고리 목록) */
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.8rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.category-item i {
+    margin-right: 0.5rem;
+    min-width: 1.2rem;
+    text-align: center;
+}
+
+.category-item span {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: normal;
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    display: inline;
+}
+
+/* 카테고리 아이템 호버 */
+.category-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateX(5px);
+}
+
+/* 활성 카테고리 아이템 */
+.category-item.active {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+    font-weight: bold;
+    padding-left: 0.8rem;
+}
+
+.category-item.active span {
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+/* 아티클 카테고리 */
+.article-category {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-round);
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: var(--transition);
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.article-category i {
+    margin-right: 0.5rem;
+}
+
+/* 카테고리 목록 */
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-list li {
+    margin-bottom: 0.8rem;
+}
+
+/* 모든 글 보기 항목 */
+.all-posts-item {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.all-posts-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    width: 90%;
+    padding: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--primary-color);
+    background-color: transparent;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1;
+}
+
+.all-posts-link::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-color-light);
+    transition: all 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+    z-index: -1;
+}
+
+.all-posts-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+}
+
+.all-posts-link:hover::before {
+    left: 0;
+}
+
+.all-posts-link.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.all-posts-link.active::before {
+    left: -100%; /* 활성화 상태에서는 애니메이션 숨김 */
+}
+
+/* 블로그 포스트 상세 페이지 카테고리 */
+.post-detail .post-category,
+.post-detail [class*="category"],
+.post-meta span,
+span.category {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-round);
+    font-weight: 500;
+    font-size: 0.85rem;
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+} 

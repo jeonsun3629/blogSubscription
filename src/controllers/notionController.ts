@@ -2,6 +2,7 @@ import { Client } from '@notionhq/client';
 import { Request, Response } from 'express';
 import { NotionBlock, NotionPost, NotionPostDetail } from '../types/notion';
 import dotenv from 'dotenv';
+import supabase from '../config/supabase';
 
 dotenv.config();
 
@@ -395,5 +396,326 @@ export const searchPosts = async (req: Request, res: Response): Promise<void> =>
   } catch (error) {
     console.error('포스트 검색 중 오류 발생:', error);
     res.status(500).json({ error: '포스트 검색 중 오류가 발생했습니다.' });
+  }
+};
+
+// 인기 포스트 가져오기 (클릭 수에 따라 정렬된 포스트)
+export const getPopularPosts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // 현재 날짜에서 7일 전 날짜 계산
+    const now = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(now.getDate() - 7);
+    
+    console.log('인기 포스트 API 호출됨');
+    console.log(`날짜 필터링: ${oneWeekAgo.toISOString()} ~ ${now.toISOString()}`);
+    
+    // 인기 포스트 쿼리 - 클릭 카운트 테이블에서 상위 5개 가져오기
+    const { data, error } = await supabase
+      .from('post_click_counts')
+      .select('notion_page_id, click_count, last_clicked_at')
+      .gte('last_clicked_at', oneWeekAgo.toISOString())
+      .lte('last_clicked_at', now.toISOString())
+      .order('click_count', { ascending: false })
+      .limit(5);
+    
+    console.log('Supabase 조회 결과:', data); // 데이터 로깅
+    
+    if (error) {
+      console.error('인기 포스트 조회 중 오류 발생:', error);
+      res.status(500).json({ error: '인기 포스트 조회 중 오류가 발생했습니다.' });
+      return;
+    }
+    
+    // 데이터가 없는 경우 원인 확인을 위한 추가 쿼리
+    if (!data || data.length === 0) {
+      console.log('최근 7일간 클릭 데이터가 없습니다. 전체 데이터 확인 중...');
+      const { data: allData, error: allDataError } = await supabase
+        .from('post_click_counts')
+        .select('notion_page_id, click_count, last_clicked_at')
+        .order('last_clicked_at', { ascending: false })
+        .limit(5);
+      
+      console.log('전체 클릭 데이터 샘플:', allData);
+      
+      if (allDataError) {
+        console.error('전체 데이터 조회 중 오류:', allDataError);
+      }
+    }
+    
+    // 포스트 ID 목록과 클릭수 맵 생성
+    const postIds = data.map(item => item.notion_page_id);
+    const clickCountMap = data.reduce((map, item) => {
+      // 문자열과 숫자 모두 처리할 수 있도록 명시적 변환
+      const count = typeof item.click_count === 'string' 
+        ? parseInt(item.click_count, 10) 
+        : (item.click_count || 0);
+      
+      map[item.notion_page_id] = count;
+      return map;
+    }, {} as Record<string, number>);
+    
+    console.log('클릭 카운트 맵:', clickCountMap); // 클릭 카운트 맵 로깅
+    
+    // 인기 포스트가 없는 경우
+    if (postIds.length === 0) {
+      console.log('인기 포스트 없음, 최신 포스트 반환');
+      // 최신 포스트 5개를 반환
+      const latestResponse = await notion.databases.query({
+        database_id: databaseId,
+        sorts: [
+          {
+            property: DATE_PROPERTY,
+            direction: 'descending',
+          },
+        ],
+        page_size: 5,
+      });
+      
+      const latestPosts: NotionPost[] = [];
+      
+      for (const pageItem of latestResponse.results) {
+        const pageObj = pageItem as any;
+        
+        if (pageObj.properties) {
+          try {
+            const post: NotionPost = {
+              id: pageObj.id,
+              title: pageObj.properties[TITLE_PROPERTY]?.title[0]?.plain_text || '제목 없음',
+              date: pageObj.properties[DATE_PROPERTY]?.date?.start || pageObj.created_time || null,
+              category: pageObj.properties[CATEGORY_PROPERTY]?.select?.name || '분류 없음',
+              excerpt: pageObj.properties[EXCERPT_PROPERTY]?.rich_text?.[0]?.plain_text || '이 포스트에 대한 요약이 없습니다.',
+              content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
+              imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
+              videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
+              clickCount: 0 // 최신 포스트는 클릭 카운트가 0으로 초기화
+            };
+            
+            const hasValidTitle = post.title !== '제목 없음' && post.title.trim() !== '';
+            
+            if (hasValidTitle) {
+              latestPosts.push(post);
+            }
+          } catch (error) {
+            console.error('포스트 처리 중 오류:', error);
+          }
+        }
+      }
+      
+      res.json({ 
+        posts: latestPosts,
+        isLatest: true,
+        debug: { message: 'No click data found, using latest posts' }
+      });
+      return;
+    }
+    
+    // 인기 포스트 데이터 가져오기
+    const popularPosts: NotionPost[] = [];
+    
+    for (const postId of postIds) {
+      try {
+        const clickCount = clickCountMap[postId] || 0;
+        console.log(`Notion API 호출: 포스트 ID=${postId}, 클릭 수=${clickCount} (${typeof clickCount})`);
+        
+        // 노션 페이지 가져오기
+        const pageInfo = await notion.pages.retrieve({ page_id: postId });
+        const pageObj = pageInfo as any;
+        
+        if (pageObj.properties) {
+          const post: NotionPost = {
+            id: pageObj.id,
+            title: pageObj.properties[TITLE_PROPERTY]?.title[0]?.plain_text || '제목 없음',
+            date: pageObj.properties[DATE_PROPERTY]?.date?.start || pageObj.created_time || null,
+            category: pageObj.properties[CATEGORY_PROPERTY]?.select?.name || '분류 없음',
+            excerpt: pageObj.properties[EXCERPT_PROPERTY]?.rich_text?.[0]?.plain_text || '이 포스트에 대한 요약이 없습니다.',
+            content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
+            imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
+            videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
+            clickCount: clickCount // 클릭 카운트 명시적 할당
+          };
+          
+          console.log(`포스트 처리 완료: ${post.title}, 클릭 수=${post.clickCount} (${typeof post.clickCount})`);
+          
+          const hasValidTitle = post.title !== '제목 없음' && post.title.trim() !== '';
+          
+          if (hasValidTitle) {
+            popularPosts.push(post);
+          }
+        }
+      } catch (error) {
+        console.error(`포스트 ID ${postId} 가져오기 중 오류:`, error);
+        // 오류가 발생한 포스트는 건너뛰고 계속 진행
+      }
+    }
+    
+    // 클릭 수 기준으로 내림차순 정렬 (재정렬)
+    popularPosts.sort((a, b) => {
+      const countA = a.clickCount || 0;
+      const countB = b.clickCount || 0;
+      return countB - countA;
+    });
+    
+    // 각 포스트의 clickCount가 숫자형인지 확인하는 추가 처리
+    const processedPosts = popularPosts.map(post => {
+      // clickCount가 문자열이면 숫자로 변환
+      let processedClickCount = post.clickCount;
+      
+      if (typeof processedClickCount === 'string') {
+        processedClickCount = parseInt(processedClickCount, 10) || 0;
+      }
+      
+      // clickCount가 null, undefined인 경우 0으로 설정
+      if (processedClickCount === null || processedClickCount === undefined) {
+        processedClickCount = 0;
+      }
+      
+      return {
+        ...post,
+        clickCount: processedClickCount, // 항상 숫자형으로 보장
+        _debug: {
+          clickCountType: typeof processedClickCount,
+          clickCountOriginal: post.clickCount,
+          clickCountProcessed: processedClickCount
+        }
+      };
+    });
+    
+    console.log('최종 응답 처리 전 포스트:', processedPosts.map(p => ({ 
+      id: p.id, 
+      title: p.title, 
+      clickCount: p.clickCount, 
+      clickCountType: typeof p.clickCount 
+    })));
+    
+    res.json({ 
+      posts: processedPosts,
+      isLatest: false,
+      debug: { source: 'click_data', timestamp: new Date().toISOString() }
+    });
+  } catch (error) {
+    console.error('인기 포스트 조회 중 예기치 않은 오류:', error);
+    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+  }
+};
+
+// 포스트 클릭 이벤트 추적
+export const trackPostClick = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { postId } = req.params;
+    
+    if (!postId) {
+      res.status(400).json({ error: '포스트 ID가 필요합니다.' });
+      return;
+    }
+
+    console.log(`포스트 클릭 이벤트 추적 시작: postId=${postId}`);
+
+    try {
+      // 클릭 이벤트 기록 (개별 로그)
+      const { error: clickError } = await supabase
+        .from('post_clicks')
+        .insert({
+          notion_page_id: postId,
+          clicked_at: new Date().toISOString(),
+          user_agent: req.headers['user-agent'] || '',
+          ip_address: req.ip || req.socket.remoteAddress || '',
+        });
+
+      if (clickError) {
+        console.error('클릭 트래킹 중 오류 발생:', clickError);
+        // 클릭 로그 오류는 무시하고 계속 진행 (중요한 것은 카운트 업데이트)
+      }
+
+      // Upsert 패턴 사용 - 존재하면 업데이트, 없으면 삽입
+      const now = new Date().toISOString();
+      
+      // 1. 먼저 해당 레코드가 존재하는지 확인
+      const { data: existingRecords, error: checkError } = await supabase
+        .from('post_click_counts')
+        .select('click_count, notion_page_id')
+        .eq('notion_page_id', postId);
+      
+      console.log('기존 클릭 카운트 레코드 확인 결과:', existingRecords);
+
+      if (checkError) {
+        console.error('레코드 확인 중 오류:', checkError);
+        res.status(500).json({ error: '클릭 카운트 확인 중 오류가 발생했습니다.' });
+        return;
+      }
+      
+      let result;
+      
+      if (existingRecords && existingRecords.length > 0) {
+        // 2A. 레코드가 존재하면 업데이트
+        const currentCount = parseInt(existingRecords[0].click_count, 10) || 0;
+        const newCount = currentCount + 1;
+        
+        console.log(`기존 레코드 업데이트: postId=${postId}, ${currentCount} → ${newCount}`);
+        
+        const { data: updateData, error: updateError } = await supabase
+          .from('post_click_counts')
+          .update({ 
+            click_count: newCount,
+            last_clicked_at: now
+          })
+          .eq('notion_page_id', postId);
+          
+        if (updateError) {
+          console.error('업데이트 오류:', updateError);
+          res.status(500).json({ error: '클릭 카운트 업데이트 중 오류가 발생했습니다.' });
+          return;
+        }
+        
+        console.log('레코드 업데이트 성공:', updateData);
+        result = { updated: true, count: newCount };
+      } else {
+        // 2B. 레코드가 없으면 새로 삽입
+        console.log(`새 레코드 삽입 시도: postId=${postId}, click_count=1`);
+        
+        // 3. 중복 키 오류를 방지하기 위해 upsert 사용
+        const { data: upsertData, error: upsertError } = await supabase
+          .from('post_click_counts')
+          .upsert({
+            notion_page_id: postId,
+            click_count: 1,
+            last_clicked_at: now
+          }, {
+            onConflict: 'notion_page_id',  // 충돌 시 notion_page_id 기준으로 처리
+            ignoreDuplicates: false        // 중복은 무시하지 않고 업데이트
+          });
+          
+        if (upsertError) {
+          console.error('Upsert 오류:', upsertError);
+          res.status(500).json({ error: '클릭 카운트 업데이트 중 오류가 발생했습니다.' });
+          return;
+        }
+        
+        console.log('새 레코드 삽입 또는 업데이트 성공:', upsertData);
+        result = { inserted: true, count: 1 };
+      }
+      
+      // 성공적으로 처리된 후 현재 값 확인
+      const { data: verifyData } = await supabase
+        .from('post_click_counts')
+        .select('click_count')
+        .eq('notion_page_id', postId);
+        
+      console.log(`최종 검증: postId=${postId}의 현재 클릭 카운트:`, verifyData);
+      
+      console.log(`포스트 ${postId} 클릭 카운트 업데이트 완료`);
+      res.status(200).json({ 
+        success: true, 
+        current_count: verifyData?.[0]?.click_count || 1,
+        result
+      });
+      
+    } catch (innerError) {
+      console.error('클릭 처리 중 오류:', innerError);
+      res.status(500).json({ error: '클릭 처리 중 오류가 발생했습니다.' });
+    }
+  } catch (error) {
+    console.error('클릭 트래킹 중 예기치 않은 오류:', error);
+    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
   }
 }; 

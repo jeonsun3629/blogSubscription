@@ -1,0 +1,79 @@
+/* 페이지네이션 컴포넌트 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.pagination a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.pagination a.next,
+.pagination a.prev {
+    width: auto;
+    padding: 0 var(--spacing-sm);
+}
+
+.pagination a.prev i {
+    margin-right: 0.3rem;
+}
+
+.pagination a.next i {
+    margin-left: 0.3rem;
+}
+
+.pagination a.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.pagination a:active:not(.active) {
+    transform: translateY(0);
+}
+
+/* 모바일 반응형 조정 */
+@media (max-width: 767px) {
+    .pagination {
+        gap: 0.2rem;
+    }
+    
+    .pagination a {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .pagination a.next,
+    .pagination a.prev {
+        padding: 0 0.5rem;
+    }
+}
+
+/* 더 작은 화면 조정 */
+@media (max-width: 375px) {
+    .pagination a {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+} 

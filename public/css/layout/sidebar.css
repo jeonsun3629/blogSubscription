@@ -1,0 +1,149 @@
+/* 사이드바 스타일 */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.sidebar-widget {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--box-shadow);
+}
+
+.sidebar-widget h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-color);
+    font-weight: 600;
+}
+
+/* 인기 게시물 목록 */
+.popular-posts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.popular-posts li {
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.popular-posts li:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.popular-posts li a {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+.popular-posts li a:hover .post-title {
+    color: var(--primary-color);
+}
+
+.post-title {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    transition: color 0.3s;
+    line-height: 1.4;
+}
+
+.post-date {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* 구독 폼 */
+.subscribe-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.subscribe-form input {
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.subscribe-form input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+.subscribe-form button {
+    padding: 0.8rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.subscribe-form button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.subscribe-form .form-note {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: var(--spacing-xs);
+}
+
+/* 태그 클라우드 */
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-cloud a {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background-color: var(--light-color);
+    color: var(--text-color);
+    border-radius: var(--radius-round);
+    font-size: 0.8rem;
+    transition: var(--transition);
+}
+
+.tag-cloud a:hover {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* 반응형 조정 */
+@media (max-width: 991px) {
+    .sidebar {
+        grid-template-columns: repeat(2, 1fr);
+        display: grid;
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 767px) {
+    .sidebar {
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar-widget {
+        padding: var(--spacing-sm);
+    }
+} 
