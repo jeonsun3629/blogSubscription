@@ -1,0 +1,67 @@
+/* 광고 컨테이너 스타일 */
+.ad-container {
+  margin: 2rem 0;
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 메인 페이지 광고 */
+.ad-banner {
+  width: 100%;
+  max-height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 포스트 페이지 내부 광고 */
+.post-ad {
+  margin: 2.5rem 0;
+}
+
+/* 사이드바 광고 */
+.sidebar-ad {
+  margin-bottom: 2rem;
+}
+
+/* 광고 라벨 */
+.ad-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 0 0 0 8px;
+}
+
+/* 스폰서 광고 스타일 */
+.sponsored-content {
+  border: 1px solid var(--border-color);
+}
+
+.sponsored-image {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+/* 작은 화면에서 광고 반응형 처리 */
+@media (max-width: 768px) {
+  .ad-container {
+    padding: 0.5rem;
+  }
+  
+  .sponsored-image {
+    max-height: 150px;
+  }
+} 

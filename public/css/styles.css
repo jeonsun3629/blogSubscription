@@ -24,6 +24,7 @@
 @import 'components/pagination.css';
 @import 'components/forms.css';
 @import 'components/scroll-to-top.css';
+@import 'components/ads.css';
 
 /* 섹션 */
 @import 'sections/articles.css';

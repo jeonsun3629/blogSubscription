@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google AdSense 코드 -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
     <style>
         /* 포스트 페이지 스타일 */
         .single-post {
@@ -257,13 +259,71 @@
         </div>
     </header>
 
-    <!-- 포스트 콘텐츠 -->
+    <!-- 메인 콘텐츠 섹션 -->
     <main class="container main-content">
-        <div class="single-post">
-            <div id="post-content" class="post-container">
-                <!-- 포스트 내용이 여기에 동적으로 로드됩니다 -->
-                <div class="loading">
-                    <p>포스트를 불러오는 중입니다...</p>
+        <div class="post-container">
+            <div class="loading" id="loading-post">
+                <p>포스트를 불러오는 중입니다...</p>
+            </div>
+            <div class="error-message" id="error-message" style="display: none;">
+                <h2>포스트를 불러올 수 없습니다</h2>
+                <p>잠시 후 다시 시도해주세요. 문제가 계속되면 관리자에게 문의하세요.</p>
+                <a href="/" class="btn-primary">홈으로 돌아가기</a>
+            </div>
+            <article class="single-post" id="post-content" style="display: none;">
+                <h1 class="post-title"></h1>
+                <div class="post-meta">
+                    <span class="post-date"></span>
+                    <span class="post-category"></span>
+                </div>
+                <div class="post-featured-image" id="post-image"></div>
+                <div class="post-content" id="post-body">
+                    <!-- 여기에 포스트 내용이 동적으로 삽입됩니다 -->
+                </div>
+                
+                <!-- 포스트 중간 광고 -->
+                <div class="ad-container post-ad">
+                    <p class="ad-label">광고</p>
+                    <!-- AdSense 광고 코드 -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-YOUR_ADSENSE_ID"
+                         data-ad-slot="YOUR_POST_CONTENT_AD_SLOT"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                
+                <div class="post-video" id="post-video"></div>
+                <div class="post-source">
+                    <a href="https://buttondown.email/ainews/" target="_blank">
+                        원본 출처 보기 <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </article>
+            
+            <!-- 포스트 하단 광고 -->
+            <div class="ad-container">
+                <p class="ad-label">광고</p>
+                <!-- AdSense 광고 코드 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-YOUR_ADSENSE_ID"
+                     data-ad-slot="YOUR_POST_BOTTOM_AD_SLOT"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            
+            <!-- 관련 포스트 섹션 -->
+            <div class="related-posts">
+                <h3>관련 포스트</h3>
+                <div class="articles" id="related-posts">
+                    <!-- 관련 포스트가 동적으로 로드됩니다 -->
                 </div>
             </div>
         </div>
@@ -313,6 +373,9 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
+    <!-- 스크립트 -->
     <script src="/public/js/script.js"></script>
+    <!-- 광고 관리 스크립트 -->
+    <script src="/public/js/ads.js"></script>
 </body>
 </html> 
