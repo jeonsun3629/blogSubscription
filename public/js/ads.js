@@ -48,7 +48,7 @@ function createAdElement(adSlot) {
   const adInsElement = document.createElement('ins');
   adInsElement.className = 'adsbygoogle';
   adInsElement.style.display = 'block';
-  adInsElement.setAttribute('data-ad-client', 'ca-pub-YOUR_ADSENSE_ID');
+  adInsElement.setAttribute('data-ad-client', 'ca-pub-4387875388612593');
   adInsElement.setAttribute('data-ad-slot', adSlot);
   adInsElement.setAttribute('data-ad-format', 'auto');
   adInsElement.setAttribute('data-full-width-responsive', 'true');
