@@ -345,10 +345,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 포스트 상세 페이지에서 포스트 내용 로드
     if (document.getElementById('post-content') && window.location.pathname.includes('/post/')) {
-        const postId = window.location.pathname.split('/post/')[1];
-        if (postId) {
-            loadPostContent(postId);
+        console.log('포스트 상세 페이지 감지됨');
+        console.log('현재 URL:', window.location.href);
+        console.log('pathname:', window.location.pathname);
+        
+        try {
+            const pathParts = window.location.pathname.split('/');
+            console.log('URL 경로 분석:', pathParts);
+            
+            // /post/ 다음에 오는 부분이 postId
+            const postIndex = pathParts.indexOf('post');
+            const postId = postIndex >= 0 && postIndex < pathParts.length - 1 ? pathParts[postIndex + 1] : null;
+            
+            console.log('추출된 postId:', postId);
+            
+            if (postId) {
+                console.log('포스트 로딩 함수 호출 준비. ID:', postId);
+                loadPostContent(postId);
+            } else {
+                console.error('URL에서 포스트 ID를 추출할 수 없습니다.');
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').querySelector('p').textContent = 'URL에서 포스트 ID를 찾을 수 없습니다.';
+                document.getElementById('loading-post').style.display = 'none';
+            }
+        } catch (error) {
+            console.error('포스트 ID 추출 중 오류:', error);
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('error-message').querySelector('p').textContent = `URL 처리 중 오류: ${error.message}`;
+            document.getElementById('loading-post').style.display = 'none';
         }
+    } else if (window.location.pathname.includes('/post/')) {
+        console.warn('포스트 페이지로 탐지되었으나 #post-content 요소를 찾을 수 없습니다.');
+        console.log('현재 URL:', window.location.href);
+        console.log('문서 내 요소 확인:');
+        console.log('- #post-content 존재:', !!document.getElementById('post-content'));
+        console.log('- #loading-post 존재:', !!document.getElementById('loading-post'));
+        console.log('- #error-message 존재:', !!document.getElementById('error-message'));
     }
 
     // 상세 페이지 카테고리 스타일 적용
@@ -730,7 +762,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 포스트 상세 내용 로드
     async function loadPostContent(postId) {
+        console.log('==== 포스트 로딩 시작 ====');
+        console.log('요청된 포스트 ID:', postId);
+        
         const postContainer = document.getElementById('post-content');
+        const loadingElement = document.getElementById('loading-post');
+        const errorElement = document.getElementById('error-message');
+        
+        console.log('DOM 요소 상태:');
+        console.log('- postContainer:', postContainer);
+        console.log('- loadingElement:', loadingElement);
+        console.log('- errorElement:', errorElement);
+        console.log('- postContainer display:', postContainer ? getComputedStyle(postContainer).display : 'element not found');
+        console.log('- loadingElement display:', loadingElement ? getComputedStyle(loadingElement).display : 'element not found');
+        
+        // 명시적으로 로딩 표시 및 컨테이너 숨김
+        if (loadingElement) loadingElement.style.display = 'block';
+        if (errorElement) errorElement.style.display = 'none';
+        if (postContainer) postContainer.style.display = 'none';
         
         // 배경색 가져오는 헬퍼 함수
         function getBackgroundColor(category) {
@@ -744,28 +793,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         try {
+            console.log('API 요청 시작:', `/api/posts/${postId}`);
             const response = await fetch(`/api/posts/${postId}`);
+            console.log('API 응답 상태:', response.status, response.statusText);
+            console.log('API 응답 헤더:', [...response.headers.entries()]);
             
             if (!response.ok) {
-                throw new Error('포스트를 가져오는 중 오류가 발생했습니다.');
+                throw new Error(`API 오류: ${response.status} ${response.statusText}`);
             }
             
             const post = await response.json();
+            console.log('API 응답 데이터:', post);
+            
+            if (!post || !post.title) {
+                console.error('유효하지 않은 포스트 데이터:', post);
+                throw new Error('포스트 데이터가 유효하지 않습니다');
+            }
+            
             const categoryStyle = getCategoryStyle(post.category);
             
             // URL 찾기 (마지막 블록이나 "https://" 패턴 확인)
             let originalUrl = '';
-            for (let i = post.content.length - 1; i >= 0; i--) {
-                const block = post.content[i];
-                if (block.text && block.text.includes('https://')) {
-                    // URL 패턴 추출
-                    const urlMatch = block.text.match(/(https?:\/\/[^\s]+)/);
-                    if (urlMatch) {
-                        originalUrl = urlMatch[0];
-                        break;
+            if (post.content && Array.isArray(post.content)) {
+                for (let i = post.content.length - 1; i >= 0; i--) {
+                    const block = post.content[i];
+                    if (block.text && block.text.includes('https://')) {
+                        // URL 패턴 추출
+                        const urlMatch = block.text.match(/(https?:\/\/[^\s]+)/);
+                        if (urlMatch) {
+                            originalUrl = urlMatch[0];
+                            break;
+                        }
                     }
                 }
+            } else {
+                console.warn('포스트 콘텐츠가 배열이 아니거나 존재하지 않습니다:', post.content);
             }
+            
+            console.log('HTML 생성 시작');
             
             // 포스트 HTML 생성
             let postHtml = `
@@ -917,7 +982,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
             
-            postContainer.innerHTML = postHtml;
+            console.log('HTML 생성 완료. HTML 길이:', postHtml.length);
+            
+            // DOM 업데이트 전 상태 확인
+            console.log('DOM 업데이트 전:');
+            console.log('- postContainer display:', postContainer ? getComputedStyle(postContainer).display : 'element not found');
+            console.log('- loadingElement display:', loadingElement ? getComputedStyle(loadingElement).display : 'element not found');
+            
+            // 로딩 숨기고 컨텐츠 표시
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (postContainer) {
+                postContainer.innerHTML = postHtml;
+                postContainer.style.display = 'block';
+                console.log('postContainer HTML 업데이트 완료. 현재 display:', getComputedStyle(postContainer).display);
+            } else {
+                console.error('postContainer 요소를 찾을 수 없습니다!');
+            }
             
             // 페이지 타이틀 업데이트
             document.title = `${post.title} - AI 트렌드 파인더`;
@@ -925,18 +1005,38 @@ document.addEventListener('DOMContentLoaded', function() {
             // 불릿 포인트 스타일링 적용
             applyBulletPointStyling();
             
+            // DOM 변경 후 최종 상태 확인
+            console.log('DOM 업데이트 후:');
+            console.log('- postContainer visibility:', postContainer ? getComputedStyle(postContainer).visibility : 'element not found');
+            console.log('- postContainer display:', postContainer ? getComputedStyle(postContainer).display : 'element not found');
+            console.log('- postContainer offsetHeight:', postContainer ? postContainer.offsetHeight : 'element not found');
+            
             // 페이지 로드 시 자동으로 클릭 이벤트 추적
+            console.log('클릭 이벤트 추적 시작');
             await trackPostClick(postId);
+            console.log('==== 포스트 로딩 완료 ====');
             
         } catch (error) {
-            console.error('포스트를 가져오는 중 오류 발생:', error);
-            postContainer.innerHTML = `
-                <div class="error-message">
-                    <h2>오류 발생</h2>
-                    <p>포스트를 불러오는 중 문제가 발생했습니다. 나중에 다시 시도해 주세요.</p>
-                    <p><a href="/">메인 페이지로 돌아가기</a></p>
-                </div>
-            `;
+            console.error('==== 포스트 로딩 오류 ====');
+            console.error('오류 세부 정보:', error);
+            console.error('오류 스택:', error.stack);
+            
+            // 로딩 숨기고 오류 표시
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (errorElement) {
+                errorElement.style.display = 'block';
+                errorElement.querySelector('p').textContent = `오류 메시지: ${error.message}`;
+            } else if (postContainer) {
+                postContainer.style.display = 'block';
+                postContainer.innerHTML = `
+                    <div class="error-message">
+                        <h2>오류 발생</h2>
+                        <p>포스트를 불러오는 중 문제가 발생했습니다: ${error.message}</p>
+                        <p>콘솔을 확인하여 자세한 오류 정보를 확인하세요.</p>
+                        <p><a href="/">메인 페이지로 돌아가기</a></p>
+                    </div>
+                `;
+            }
         }
     }
 
