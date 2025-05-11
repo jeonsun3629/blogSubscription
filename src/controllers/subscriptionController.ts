@@ -47,31 +47,31 @@ export const subscribe = async (req: Request, res: Response) => {
       }
 
       if (existingSubscriber.status === 'pending') {
-        // 재전송 로직
+        // 재전송 로직 - 이메일 전송 비활성화
         const verificationUrl = `${BASE_URL}/verify-subscription/${existingSubscriber.verification_token}`;
         
         try {
-          console.log('이메일 전송 시도:', {
+          console.log('이메일 전송 시도 (비활성화됨):', {
             to: email,
             subject: 'AI 트렌드 파인더 구독 확인',
             verificationUrl
           });
           
-          // 이메일 전송 활성화
+          // 이메일 전송 비활성화
+          /*
           await sendEmail(
             email,
             'AI 트렌드 파인더 구독 확인',
             emailTemplates.verification(name || '', verificationUrl)
           );
-          console.log('이메일 전송 성공');
+          */
         } catch (emailError) {
           console.error('확인 이메일 발송 실패:', emailError);
-          return res.status(500).json({ success: false, message: '이메일 전송 중 오류가 발생했습니다. 이메일 설정을 확인하세요.' });
         }
 
         return res.status(200).json({ 
           success: true, 
-          message: '구독 확인 이메일을 발송했습니다. 이메일을 확인해 주세요.',
+          message: '구독 신청이 완료되었습니다. (이메일 전송 기능은 현재 비활성화되어 있습니다)',
           subscribed: false,
           pending: true
         });
@@ -94,7 +94,7 @@ export const subscribe = async (req: Request, res: Response) => {
           return res.status(500).json({ success: false, message: '구독 처리 중 오류가 발생했습니다.' });
         }
 
-        // 새 토큰으로 이메일 재발송
+        // 새 토큰으로 이메일 재발송 - 이메일 전송 비활성화
         const { data: updatedSubscriber } = await supabase
           .from('subscribers')
           .select('verification_token')
@@ -104,27 +104,27 @@ export const subscribe = async (req: Request, res: Response) => {
         const verificationUrl = `${BASE_URL}/verify-subscription/${updatedSubscriber!.verification_token}`;
         
         try {
-          console.log('이메일 전송 시도:', {
+          console.log('이메일 전송 시도 (비활성화됨):', {
             to: email,
             subject: 'AI 트렌드 파인더 구독 확인',
             verificationUrl
           });
           
-          // 이메일 전송 활성화
+          // 이메일 전송 비활성화
+          /*
           await sendEmail(
             email,
             'AI 트렌드 파인더 구독 확인',
             emailTemplates.verification(name || '', verificationUrl)
           );
-          console.log('이메일 전송 성공');
+          */
         } catch (emailError) {
           console.error('확인 이메일 발송 실패:', emailError);
-          return res.status(500).json({ success: false, message: '이메일 전송 중 오류가 발생했습니다. 이메일 설정을 확인하세요.' });
         }
 
         return res.status(200).json({ 
           success: true, 
-          message: '구독 확인 이메일을 발송했습니다. 이메일을 확인해 주세요.',
+          message: '구독 신청이 완료되었습니다. (이메일 전송 기능은 현재 비활성화되어 있습니다)',
           subscribed: false,
           pending: true
         });
@@ -150,31 +150,31 @@ export const subscribe = async (req: Request, res: Response) => {
       return res.status(500).json({ success: false, message: '구독 처리 중 오류가 발생했습니다.' });
     }
 
-    // 확인 이메일 발송
+    // 확인 이메일 발송 - 이메일 전송 비활성화
     const verificationUrl = `${BASE_URL}/verify-subscription/${verificationToken}`;
     
     try {
-      console.log('이메일 전송 시도:', {
+      console.log('이메일 전송 시도 (비활성화됨):', {
         to: email,
         subject: 'AI 트렌드 파인더 구독 확인',
         verificationUrl
       });
       
-      // 이메일 전송 활성화
+      // 이메일 전송 비활성화
+      /*
       await sendEmail(
         email,
         'AI 트렌드 파인더 구독 확인',
         emailTemplates.verification(name || '', verificationUrl)
       );
-      console.log('이메일 전송 성공');
+      */
     } catch (emailError) {
       console.error('확인 이메일 발송 실패:', emailError);
-      return res.status(500).json({ success: false, message: '이메일 전송 중 오류가 발생했습니다. 이메일 설정을 확인하세요.' });
     }
 
     return res.status(200).json({ 
       success: true, 
-      message: '구독 확인 이메일을 발송했습니다. 이메일을 확인해 주세요.',
+      message: '구독 신청이 완료되었습니다. (이메일 전송 기능은 현재 비활성화되어 있습니다)',
       subscribed: false,
       pending: true
     });

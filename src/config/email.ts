@@ -7,16 +7,6 @@ dotenv.config();
 export const createTransporter = () => {
   // 환경 설정에 따라 다양한 이메일 서비스 사용 가능
   // Gmail, SendGrid, AWS SES, Mailgun 등
-  console.log('이메일 설정 정보:', {
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE === 'true',
-    user: process.env.EMAIL_USER ? '설정됨' : '미설정',
-    pass: process.env.EMAIL_PASSWORD ? '설정됨' : '미설정',
-    from: process.env.EMAIL_FROM || 'noreply@example.com',
-    fromName: process.env.EMAIL_FROM_NAME || 'AI 트렌드 파인더'
-  });
-  
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.EMAIL_PORT || '587'),
@@ -43,7 +33,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     console.log(`이메일이 성공적으로 발송되었습니다: ${info.messageId}`);
     return info;
   } catch (error) {
-    console.error('이메일 발송 실패 상세 정보:', error);
+    console.error('이메일 발송 실패:', error);
     throw error;
   }
 };
