@@ -226,8 +226,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     button.disabled = true;
                     button.textContent = '처리 중...';
                     
+                    console.log('요청 시작:', { email });
+                    
                     // API 호출
-                    const response = await fetch('/api/subscribe', {
+                    const response = await fetch(window.location.origin + '/api/subscribe', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -235,7 +237,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         body: JSON.stringify({ email })
                     });
                     
+                    console.log('응답 상태:', response.status, response.statusText);
+                    
+                    // 오류 응답 처리 개선
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('API 오류 응답:', errorText);
+                        throw new Error(`API 오류: ${response.status} ${response.statusText}`);
+                    }
+                    
                     const data = await response.json();
+                    console.log('응답 데이터:', data);
                     
                     // 버튼 원래 상태로 복원
                     button.disabled = false;
@@ -252,8 +264,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert(`구독 처리 중 오류가 발생했습니다: ${data.message}`);
                     }
                 } catch (error) {
-                    console.error('구독 요청 오류:', error);
+                    console.error('구독 요청 오류 상세:', error);
                     alert('서버 연결 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+                    
+                    // 버튼 상태 복원 추가
+                    const button = this.querySelector('button');
+                    button.disabled = false;
+                    button.textContent = originalText;
                 }
             } else {
                 alert('유효한 이메일 주소를 입력해 주세요.');
@@ -275,8 +292,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     button.disabled = true;
                     button.textContent = '처리 중...';
                     
+                    console.log('요청 시작:', { email, name });
+                    
                     // API 호출
-                    const response = await fetch('/api/subscribe', {
+                    const response = await fetch(window.location.origin + '/api/subscribe', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -284,7 +303,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         body: JSON.stringify({ email, name })
                     });
                     
+                    console.log('응답 상태:', response.status, response.statusText);
+                    
+                    // 오류 응답 처리 개선
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('API 오류 응답:', errorText);
+                        throw new Error(`API 오류: ${response.status} ${response.statusText}`);
+                    }
+                    
                     const data = await response.json();
+                    console.log('응답 데이터:', data);
                     
                     // 버튼 원래 상태로 복원
                     button.disabled = false;
@@ -301,8 +330,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert(`구독 처리 중 오류가 발생했습니다: ${data.message}`);
                     }
                 } catch (error) {
-                    console.error('구독 요청 오류:', error);
+                    console.error('구독 요청 오류 상세:', error);
                     alert('서버 연결 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+                    
+                    // 버튼 상태 복원 추가
+                    const button = this.querySelector('button');
+                    button.disabled = false;
+                    button.textContent = originalText;
                 }
             } else {
                 alert('이름과 유효한 이메일 주소를 모두 입력해 주세요.');
