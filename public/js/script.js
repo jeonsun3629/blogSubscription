@@ -209,18 +209,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 구독 폼 제출;'[]
+    // 구독 폼 제출
     const subscribeForm = document.getElementById('subscribe-form');
     const newsletterForm = document.getElementById('newsletter-form');
 
     if (subscribeForm) {
-        subscribeForm.addEventListener('submit', function(event) {
+        subscribeForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             const email = this.querySelector('input[type="email"]').value;
             
             if (validateEmail(email)) {
-                alert('구독해 주셔서 감사합니다! 확인 이메일을 발송했습니다.');
-                this.reset();
+                try {
+                    // 로딩 상태 표시
+                    const button = this.querySelector('button');
+                    const originalText = button.textContent;
+                    button.disabled = true;
+                    button.textContent = '처리 중...';
+                    
+                    // API 호출
+                    const response = await fetch('/api/subscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // 버튼 원래 상태로 복원
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    
+                    if (data.success) {
+                        if (data.subscribed) {
+                            alert('이미 구독 중입니다.');
+                        } else {
+                            alert('구독해 주셔서 감사합니다! 확인 이메일을 발송했습니다.');
+                            this.reset();
+                        }
+                    } else {
+                        alert(`구독 처리 중 오류가 발생했습니다: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('구독 요청 오류:', error);
+                    alert('서버 연결 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+                }
             } else {
                 alert('유효한 이메일 주소를 입력해 주세요.');
             }
@@ -228,14 +262,48 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function(event) {
+        newsletterForm.addEventListener('submit', async function(event) {
             event.preventDefault();
             const name = this.querySelector('input[type="text"]').value;
             const email = this.querySelector('input[type="email"]').value;
             
             if (name && validateEmail(email)) {
-                alert('구독해 주셔서 감사합니다! 확인 이메일을 발송했습니다.');
-                this.reset();
+                try {
+                    // 로딩 상태 표시
+                    const button = this.querySelector('button');
+                    const originalText = button.textContent;
+                    button.disabled = true;
+                    button.textContent = '처리 중...';
+                    
+                    // API 호출
+                    const response = await fetch('/api/subscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, name })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // 버튼 원래 상태로 복원
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    
+                    if (data.success) {
+                        if (data.subscribed) {
+                            alert('이미 구독 중입니다.');
+                        } else {
+                            alert('구독해 주셔서 감사합니다! 확인 이메일을 발송했습니다.');
+                            this.reset();
+                        }
+                    } else {
+                        alert(`구독 처리 중 오류가 발생했습니다: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('구독 요청 오류:', error);
+                    alert('서버 연결 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+                }
             } else {
                 alert('이름과 유효한 이메일 주소를 모두 입력해 주세요.');
             }
@@ -869,6 +937,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 원문 콘텐츠 표시 (content_full이 있으면 사용)
             if (post.content_full && post.content_full.trim() !== '') {
+                // 먼저 요약(excerpt) 표시
+                if (post.excerpt && post.excerpt.trim() !== '') {
+                    postHtml += `
+                    <div class="post-summary">
+                        <h3>요약</h3>
+                        <p>${post.excerpt}</p>
+                    </div>
+                    `;
+                }
+                
+                // 그 다음 본문(content_full) 표시
                 // 불릿포인트에 대한 줄바꿈 처리
                 let formattedContent = post.content_full;
                 
@@ -877,12 +956,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 postHtml += `
                 <div class="post-content">
+                    <h3>본문</h3>
                     ${formattedContent.replace(/\n/g, '<br>')}
                 </div>
                 `;
             } else {
                 // 원문이 없는 경우 블록 콘텐츠 처리
-                postHtml += `<div class="post-content">`;
+                // 먼저 요약(excerpt) 표시
+                if (post.excerpt && post.excerpt.trim() !== '') {
+                    postHtml += `
+                    <div class="post-summary">
+                        <h3>요약</h3>
+                        <p>${post.excerpt}</p>
+                    </div>
+                    `;
+                }
+                
+                postHtml += `<div class="post-content"><h3>본문</h3>`;
                 
                 // 불릿 포인트 아이템이 있는지 확인하고 필요한 경우 ul 요소 열기
                 let inBulletedList = false;
@@ -976,7 +1066,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 postHtml += `
                 <div class="post-source">
                     <a href="${originalUrl}" target="_blank" rel="noopener noreferrer">
-                        원본 링크 <i class="fas fa-external-link-alt"></i>
+                        자세히 보기 <i class="fas fa-external-link-alt"></i>
                     </a>
                 </div>
                 `;
@@ -1000,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 페이지 타이틀 업데이트
-            document.title = `${post.title} - AI 트렌드 파인더`;
+            document.title = `${post.title} - AI 트랜드 블로그`;
             
             // 불릿 포인트 스타일링 적용
             applyBulletPointStyling();
@@ -1072,6 +1162,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 인기 포스트 로드
     loadPopularPosts();
+
+    // 현재 연도 자동 표시
+    const currentYear = new Date().getFullYear();
+    const copyrightElements = document.querySelectorAll('.copyright-year');
+    
+    copyrightElements.forEach(function(element) {
+        element.textContent = currentYear;
+    });
 });
 
 // 인기 포스트 로드 함수

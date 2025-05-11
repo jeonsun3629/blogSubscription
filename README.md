@@ -232,3 +232,76 @@ npm run watch
 ## 라이선스
 
 MIT License 
+
+## 구독 시스템 설정
+
+구독 시스템을 사용하기 위해 다음 단계를 따라 설정하세요:
+
+### 1. 환경 변수 설정
+
+프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 다음 환경 변수를 설정합니다:
+
+```env
+# Supabase 설정
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# 서버 설정
+PORT=3000
+NODE_ENV=development
+WEBSITE_URL=http://localhost:3000 # 프로덕션에서는 실제 URL로 변경
+
+# 이메일 서비스 설정 (SMTP)
+EMAIL_HOST=smtp.gmail.com # Gmail 사용 예시, 다른 서비스도 가능
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASSWORD=your_app_password # Gmail의 경우 앱 비밀번호 사용
+EMAIL_FROM=your_email@gmail.com
+EMAIL_FROM_NAME=AI 트렌드 파인더
+
+# 알림 API 보안
+NOTIFICATION_API_KEY=your_secret_api_key_for_notifications # 임의의 안전한 문자열
+```
+
+> **참고**: Gmail을 사용하는 경우 앱 비밀번호를 생성해야 합니다. Google 계정 설정에서 2단계 인증을 활성화한 다음 앱 비밀번호를 생성하세요.
+
+### 2. 이메일 서비스 설정
+
+이메일 발송을 위해 다음 서비스 중 하나를 선택할 수 있습니다:
+
+- **Gmail**: 개인 이메일 계정을 사용하여 테스트하기 적합 (일일 발송 제한 있음)
+- **SendGrid**: 대량 이메일에 적합 (무료 티어: 일 100건)
+- **Mailgun**: 트랜잭션 이메일에 적합 (무료 티어: 월 5,000건)
+- **AWS SES**: 대규모 이메일 발송에 적합 (가장 경제적인 가격)
+
+Gmail 외 다른 서비스를 사용하려면 `src/config/email.ts` 파일의 설정을 수정하세요.
+
+### 3. 블로그 업데이트 알림 전송 방법
+
+블로그에 새 글이 게시될 때 구독자에게 알림을 보내려면:
+
+1. 관리자 권한으로 다음 API 엔드포인트를 호출합니다:
+
+```bash
+curl -X POST http://your-domain.com/api/send-update-notifications \
+  -H "x-api-key: your_notification_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "posts": [
+      {
+        "title": "새로운 AI 모델 소개",
+        "url": "http://your-domain.com/post/new-ai-model",
+        "excerpt": "최근 출시된 혁신적인 AI 모델에 대해 알아봅니다."
+      },
+      {
+        "title": "머신러닝 기초 가이드",
+        "url": "http://your-domain.com/post/ml-basics",
+        "excerpt": "머신러닝을 처음 시작하는 분들을 위한 가이드입니다."
+      }
+    ]
+  }'
+```
+
+2. 또는 자동화 스크립트를 사용하여 새 게시물이 있을 때 자동으로 알림을 보낼 수 있습니다. 
+    이를 위해 Notion API 또는 데이터베이스 업데이트를 모니터링하는 로직을 추가로 구현하세요. 
