@@ -219,10 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = this.querySelector('input[type="email"]').value;
             
             if (validateEmail(email)) {
+                // 버튼 원래 텍스트 미리 저장 (이동)
+                const button = this.querySelector('button');
+                const originalText = button.textContent;
+                
                 try {
                     // 로딩 상태 표시
-                    const button = this.querySelector('button');
-                    const originalText = button.textContent;
                     button.disabled = true;
                     button.textContent = '처리 중...';
                     
@@ -268,7 +270,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('서버 연결 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
                     
                     // 버튼 상태 복원 추가
-                    const button = this.querySelector('button');
                     button.disabled = false;
                     button.textContent = originalText;
                 }
@@ -285,10 +286,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = this.querySelector('input[type="email"]').value;
             
             if (name && validateEmail(email)) {
+                // 버튼 원래 텍스트 미리 저장 (이동)
+                const button = this.querySelector('button');
+                const originalText = button.textContent;
+                
                 try {
                     // 로딩 상태 표시
-                    const button = this.querySelector('button');
-                    const originalText = button.textContent;
                     button.disabled = true;
                     button.textContent = '처리 중...';
                     
@@ -334,7 +337,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('서버 연결 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
                     
                     // 버튼 상태 복원 추가
-                    const button = this.querySelector('button');
                     button.disabled = false;
                     button.textContent = originalText;
                 }
