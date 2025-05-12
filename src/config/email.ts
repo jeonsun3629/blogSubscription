@@ -31,7 +31,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     if (process.env.USE_SENDGRID === 'true' && process.env.SENDGRID_API_KEY) {
       const msg = {
         to,
-        from: process.env.EMAIL_FROM || 'noreply@example.com',
+        from: process.env.EMAIL_FROM || 'newsletter@aitrendblog.co.kr',
         subject,
         html,
       };
@@ -45,7 +45,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
       const transporter = createTransporter();
       
       const info = await transporter.sendMail({
-        from: `"${process.env.EMAIL_FROM_NAME || 'AI 트렌드 파인더'}" <${process.env.EMAIL_FROM || 'noreply@example.com'}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'AI 트렌드 파인더'}" <${process.env.EMAIL_FROM || 'newsletter@aitrendblog.co.kr'}>`,
         to,
         subject,
         html,
@@ -113,7 +113,7 @@ export const emailTemplates = {
       <p>AI 트렌드 파인더 블로그 구독이 성공적으로 완료되었습니다. 앞으로 최신 AI 트렌드와 유용한 정보를 정기적으로 받아보실 수 있습니다.</p>
       <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
         <p style="margin: 0;">✅ 구독 상태: <strong>활성화됨</strong></p>
-        <p style="margin: 10px 0 0;">📧 구독 이메일: <strong>${process.env.EMAIL_FROM || 'noreply@example.com'}</strong></p>
+        <p style="margin: 10px 0 0;">📧 구독 이메일: <strong>${process.env.EMAIL_FROM || 'newsletter@aitrendblog.co.kr'}</strong></p>
       </div>
       <p>블로그에 방문하여 최신 콘텐츠를 확인해 보세요:</p>
       <div style="text-align: center; margin: 30px 0;">
