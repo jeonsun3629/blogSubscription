@@ -916,23 +916,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const categoryStyle = getCategoryStyle(post.category);
             
-            // URL 찾기 (마지막 블록이나 "https://" 패턴 확인)
-            let originalUrl = '';
-            if (post.content && Array.isArray(post.content)) {
-                for (let i = post.content.length - 1; i >= 0; i--) {
-                    const block = post.content[i];
-                    if (block.text && block.text.includes('https://')) {
-                        // URL 패턴 추출
-                        const urlMatch = block.text.match(/(https?:\/\/[^\s]+)/);
-                        if (urlMatch) {
-                            originalUrl = urlMatch[0];
-                            break;
-                        }
-                    }
-                }
-            } else {
-                console.warn('포스트 콘텐츠가 배열이 아니거나 존재하지 않습니다:', post.content);
-            }
+            // Notion 페이지 ID를 사용하여 URL 생성
+            const notionUrl = `https://www.notion.so/${post.id.replace(/-/g, '')}`;
             
             console.log('HTML 생성 시작');
             
@@ -1101,7 +1086,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (originalUrl) {
                 postHtml += `
                 <div class="post-source">
-                    <a href="${originalUrl}" target="_blank" rel="noopener noreferrer">
+                    <a href="${notionUrl}" target="_blank" rel="noopener noreferrer">
                         자세히 보기 <i class="fas fa-external-link-alt"></i>
                     </a>
                 </div>
