@@ -916,8 +916,32 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const categoryStyle = getCategoryStyle(post.category);
             
-            // Notion 페이지 ID를 사용하여 URL 생성
-            const notionUrl = `https://www.notion.so/${post.id.replace(/-/g, '')}`;
+            // 원본 URL 찾기
+            let originalUrl = '';
+            
+            // 1. 서버에서 제공한 originalUrl 필드가 있으면 우선 사용
+            if (post.originalUrl) {
+                originalUrl = post.originalUrl;
+                console.log('서버에서 제공한 원본 URL 사용:', originalUrl);
+            } 
+            // 2. 없는 경우 콘텐츠에서 URL 추출 (기존 방식)
+            else if (post.content && Array.isArray(post.content)) {
+                console.log('콘텐츠에서 URL 추출 시도');
+                for (let i = post.content.length - 1; i >= 0; i--) {
+                    const block = post.content[i];
+                    if (block.text && block.text.includes('https://')) {
+                        // URL 패턴 추출
+                        const urlMatch = block.text.match(/(https?:\/\/[^\s]+)/);
+                        if (urlMatch) {
+                            originalUrl = urlMatch[0];
+                            console.log('콘텐츠에서 URL 추출됨:', originalUrl);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                console.warn('URL을 찾을 수 있는 데이터가 없습니다:', post.content);
+            }
             
             console.log('HTML 생성 시작');
             
@@ -1086,8 +1110,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (originalUrl) {
                 postHtml += `
                 <div class="post-source">
-                    <a href="${notionUrl}" target="_blank" rel="noopener noreferrer">
-                        자세히 보기 <i class="fas fa-external-link-alt"></i>
+                    <a href="${originalUrl}" target="_blank" rel="noopener noreferrer">
+                        원본 링크 보기 <i class="fas fa-external-link-alt"></i>
                     </a>
                 </div>
                 `;

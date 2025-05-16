@@ -22,6 +22,7 @@ const EXCERPT_PROPERTY = process.env.NOTION_EXCERPT_PROPERTY || 'Summary_kr';
 const CONTENT_FULL_PROPERTY = process.env.NOTION_CONTENT_FULL_PROPERTY || 'Content_full_kr';
 const IMAGE_URL_PROPERTY = process.env.NOTION_IMAGE_URL_PROPERTY || 'Image_URL';
 const VIDEO_URL_PROPERTY = process.env.NOTION_VIDEO_URL_PROPERTY || 'Video_URL';
+const URL_PROPERTY = process.env.NOTION_URL_PROPERTY || 'URL';
 
 // 모든 포스트 가져오기 (페이지네이션 지원)
 export const getAllPosts = async (req: Request, res: Response): Promise<void> => {
@@ -86,6 +87,7 @@ export const getAllPosts = async (req: Request, res: Response): Promise<void> =>
             content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
             imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
             videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
+            originalUrl: pageObj.properties[URL_PROPERTY]?.url || '',
           };
           
           // 제목이 "제목 없음"인 포스트는 제외하고 유효한 제목이 있는 포스트만 추가
@@ -162,6 +164,10 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
       console.log('Single post excerpt property structure:', JSON.stringify(excerptProperty, null, 2));
     }
     
+    // URL 필드에서 원본 URL 가져오기
+    const originalUrl = pageObj.properties[URL_PROPERTY]?.url || '';
+    console.log('Original URL from database:', originalUrl);
+    
     // 포스트 데이터 처리
     const post: NotionPostDetail = {
       id: pageObj.id,
@@ -173,6 +179,7 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
       imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
       videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
       content: await processBlocks(blocks.results),
+      originalUrl: originalUrl,
     };
     
     res.json(post);
@@ -376,6 +383,7 @@ export const searchPosts = async (req: Request, res: Response): Promise<void> =>
               content_full: content_full,
               imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
               videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
+              originalUrl: pageObj.properties[URL_PROPERTY]?.url || '',
             };
             
             matchedPosts.push(post);
@@ -488,7 +496,8 @@ export const getPopularPosts = async (req: Request, res: Response): Promise<void
               content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
               imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
               videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
-              clickCount: 0 // 최신 포스트는 클릭 카운트가 0으로 초기화
+              clickCount: 0, // 최신 포스트는 클릭 카운트가 0으로 초기화
+              originalUrl: pageObj.properties[URL_PROPERTY]?.url || '',
             };
             
             const hasValidTitle = post.title !== '제목 없음' && post.title.trim() !== '';
@@ -532,7 +541,8 @@ export const getPopularPosts = async (req: Request, res: Response): Promise<void
             content_full: pageObj.properties[CONTENT_FULL_PROPERTY]?.rich_text?.[0]?.plain_text || '',
             imageUrl: pageObj.properties[IMAGE_URL_PROPERTY]?.url || '',
             videoUrl: pageObj.properties[VIDEO_URL_PROPERTY]?.url || '',
-            clickCount: clickCount // 클릭 카운트 명시적 할당
+            clickCount: clickCount, // 클릭 카운트 명시적 할당
+            originalUrl: pageObj.properties[URL_PROPERTY]?.url || '',
           };
           
           console.log(`포스트 처리 완료: ${post.title}, 클릭 수=${post.clickCount} (${typeof post.clickCount})`);

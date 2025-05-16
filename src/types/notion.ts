@@ -10,6 +10,7 @@ export interface NotionPost {
   imageUrl?: string;
   videoUrl?: string;
   clickCount?: number;
+  originalUrl?: string;
 }
 
 export interface NotionPostDetail extends NotionPost {
