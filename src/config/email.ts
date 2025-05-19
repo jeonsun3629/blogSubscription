@@ -95,7 +95,7 @@ export const emailTemplates = {
         `).join('')}
       </div>
       
-      <p style="margin-top: 30px;">더 많은 AI 트렌드와 업데이트는 <a href="${process.env.WEBSITE_URL || 'https://example.com'}" style="color: #3498db;">웹사이트</a>에서 확인하세요.</p>
+      <p style="margin-top: 30px;">더 많은 AI 트렌드와 업데이트는 <a href="${process.env.WEBSITE_URL || 'https://www.aitrendblog.co.kr'}" style="color: #3498db;">웹사이트</a>에서 확인하세요.</p>
       
       <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
       <p style="color: #777; font-size: 12px;">

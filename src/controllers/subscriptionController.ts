@@ -7,7 +7,7 @@ import crypto from 'crypto';
 dotenv.config();
 
 // 기본 웹사이트 URL
-const BASE_URL = process.env.WEBSITE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.WEBSITE_URL || 'https://www.aitrendblog.co.kr';
 
 // 구독 신청 처리
 export const subscribe = async (req: Request, res: Response) => {
