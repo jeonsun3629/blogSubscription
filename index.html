@@ -10,8 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google AdSense 코드 -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4387875388612593" crossorigin="anonymous"></script>
+
 </head>
 <body>
     <!-- 헤더 섹션 -->
@@ -48,7 +47,6 @@
             <!-- 메인 콘텐츠 영역 -->
             <section class="articles-section">
                 <h2>최신 AI 트렌드 <span class="section-divider"></span></h2>
-                
                 <!-- 메인 광고 배너 -->
                 <div class="ad-container ad-banner">
                     <p class="ad-label">광고</p>
@@ -107,6 +105,13 @@
                             <p>인기 포스트를 불러오는 중입니다...</p>
                         </li>
                     </ul>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3>오늘 방문자</h3>
+                    <div id="visitor-count-display" style="font-weight: bold; color: #2d72d9; padding-top: 0.5em;">
+                        <span id="visitor-count-number">-</span>명
+                    </div>
                 </div>
 
                 <div class="sidebar-widget">
@@ -235,5 +240,38 @@
     <script src="/public/js/script.js"></script>
     <!-- 광고 관리 스크립트 -->
     <script src="/public/js/ads.js"></script>
+    <script>
+      // 방문자 기록(POST)
+      fetch('/api/visitor-log', { method: 'POST' })
+        .then(response => {
+          if (!response.ok) {
+            console.error('Failed to log visitor:', response.status, response.statusText);
+          }
+        })
+        .catch(error => {
+          console.error('Error logging visitor:', error);
+        });
+
+      // 오늘 방문자 수 조회(GET)
+      fetch('/api/visitor-count-today')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}, statusText: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (typeof data.count === 'number') {
+            document.getElementById('visitor-count-number').textContent = data.count;
+          } else {
+            console.warn('Visitor count is not a number:', data.count);
+            document.getElementById('visitor-count-number').textContent = '-';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching visitor count:', error);
+          document.getElementById('visitor-count-number').textContent = '?';
+        });
+    </script>
 </body>
 </html> 

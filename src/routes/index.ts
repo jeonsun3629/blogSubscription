@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 import * as notionController from '../controllers/notionController';
 import * as subscriptionController from '../controllers/subscriptionController';
+import * as analyticsController from '../controllers/analyticsController';
 
 const router: Router = express.Router();
 
@@ -34,5 +35,11 @@ router.get('/unsubscribe/:email/:token', subscriptionController.unsubscribe);
 
 // 블로그 업데이트 알림 발송 (관리자용)
 router.post('/api/send-update-notifications', subscriptionController.sendBlogUpdateNotifications);
+
+// 오늘 방문자 수 반환
+router.get('/api/visitor-count-today', analyticsController.getTodayVisitorCount);
+
+// 방문자 기록
+router.post('/api/visitor-log', analyticsController.logVisitor);
 
 export default router; 

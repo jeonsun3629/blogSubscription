@@ -74,4 +74,61 @@ export const getPopularPosts = async (req: Request, res: Response): Promise<void
     console.error('인기 포스트 조회 중 예기치 않은 오류:', error);
     res.status(500).json({ error: '서버 오류가 발생했습니다.' });
   }
+};
+
+// 방문자 기록 저장
+export const logVisitor = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '';
+    const userAgent = req.headers['user-agent'] || '';
+    const ipStr = Array.isArray(ip) ? ip[0] : ip;
+    const { error } = await supabase.from('visitor_logs').insert({
+      ip_address: ipStr,
+      user_agent: userAgent,
+      visited_at: new Date()
+    });
+    if (error) {
+      console.error('방문자 기록 저장 중 오류:', error);
+      res.status(500).json({ error: '방문자 기록 저장 중 오류가 발생했습니다.' });
+      return;
+    }
+    res.status(201).json({ success: true });
+  } catch (error) {
+    console.error('방문자 기록 저장 중 예기치 않은 오류:', error);
+    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+  }
+};
+
+// 오늘(한국시간) 방문자 수 반환
+export const getTodayVisitorCount = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // 한국시간(KST) 기준 오늘 00:00 ~ 23:59
+    const now = new Date();
+    const kstOffset = 9 * 60; // KST: UTC+9
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const kstNow = new Date(utc + (kstOffset * 60000));
+    const start = new Date(kstNow);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(kstNow);
+    end.setHours(23, 59, 59, 999);
+
+    const { data, error } = await supabase
+      .from('visitor_logs')
+      .select('ip_address')
+      .gte('visited_at', start.toISOString())
+      .lte('visited_at', end.toISOString());
+
+    if (error) {
+      console.error('오늘 방문자 수 조회 중 오류:', error);
+      res.status(500).json({ error: 'DB 조회 오류' });
+      return;
+    }
+
+    // 유니크 IP만 카운트
+    const uniqueIps = Array.from(new Set((data || []).map(v => v.ip_address)));
+    res.json({ count: uniqueIps.length });
+  } catch (error) {
+    console.error('오늘 방문자 수 집계 중 예기치 않은 오류:', error);
+    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+  }
 }; 
