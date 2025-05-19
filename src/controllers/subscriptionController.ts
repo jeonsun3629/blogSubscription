@@ -182,15 +182,20 @@ export const subscribe = async (req: Request, res: Response) => {
 export const verifySubscription = async (req: Request, res: Response) => {
   try {
     const { token } = req.params;
+    console.log('[verifySubscription] Received token:', token); // 토큰 수신 로그
 
     if (!token) {
+      console.log('[verifySubscription] Token not found in params');
       return res.status(400).json({ success: false, message: '유효하지 않은 요청입니다.' });
     }
 
     // Supabase 함수 호출로 확인 처리
+    console.log('[verifySubscription] Calling Supabase RPC: verify_subscription with token:', token);
     const { data, error } = await supabase
       .rpc('verify_subscription', { token })
       .single();
+
+    console.log('[verifySubscription] Supabase RPC response - data:', data, 'error:', error); // Supabase 응답 로그
 
     if (error) {
       console.error('구독 확인 오류:', error);
