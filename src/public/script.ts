@@ -326,8 +326,53 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 페이지네이션 HTML 생성
             let paginationHtml = '<div class="pagination">';
-            for (let i = 1; i <= data.pagination.totalPages; i++) {
-                paginationHtml += `<a href="#" class="${i === data.pagination.currentPage ? 'active' : ''}" data-page="${i}">${i}</a>`;
+            
+            // 페이지네이션 로직 개선 - 최대 10개까지만 보이게
+            const maxVisiblePages = 10;
+            const totalPages = data.pagination.totalPages;
+            const currentPage = data.pagination.currentPage;
+            
+            let startPage = 1;
+            let endPage = totalPages;
+            
+            if (totalPages > maxVisiblePages) {
+                // 현재 페이지를 중심으로 표시할 범위 계산
+                const halfVisible = Math.floor(maxVisiblePages / 2);
+                
+                if (currentPage <= halfVisible) {
+                    // 현재 페이지가 앞쪽에 있을 때
+                    startPage = 1;
+                    endPage = maxVisiblePages;
+                } else if (currentPage > totalPages - halfVisible) {
+                    // 현재 페이지가 뒤쪽에 있을 때
+                    startPage = totalPages - maxVisiblePages + 1;
+                    endPage = totalPages;
+                } else {
+                    // 현재 페이지가 중간에 있을 때
+                    startPage = currentPage - halfVisible;
+                    endPage = currentPage + halfVisible;
+                }
+            }
+            
+            // 첫 페이지가 보이지 않으면 첫 페이지와 ... 추가
+            if (startPage > 1) {
+                paginationHtml += `<a href="#" data-page="1">1</a>`;
+                if (startPage > 2) {
+                    paginationHtml += `<span class="ellipsis">...</span>`;
+                }
+            }
+            
+            // 페이지 번호 생성
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `<a href="#" class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</a>`;
+            }
+            
+            // 마지막 페이지가 보이지 않으면 ... 와 마지막 페이지 추가
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHtml += `<span class="ellipsis">...</span>`;
+                }
+                paginationHtml += `<a href="#" data-page="${totalPages}">${totalPages}</a>`;
             }
             
             if (data.pagination.hasNextPage) {

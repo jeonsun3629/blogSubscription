@@ -51,6 +51,20 @@
     transform: translateY(0);
 }
 
+/* 페이지네이션 ellipsis (줄임표) 스타일 */
+.pagination .ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1.2rem;
+    user-select: none;
+    pointer-events: none;
+}
+
 /* 모바일 반응형 조정 */
 @media (max-width: 767px) {
     .pagination {
@@ -67,6 +81,12 @@
     .pagination a.prev {
         padding: 0 0.5rem;
     }
+    
+    .pagination .ellipsis {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
 }
 
 /* 더 작은 화면 조정 */
@@ -75,5 +95,11 @@
         width: 30px;
         height: 30px;
         font-size: 0.85rem;
+    }
+    
+    .pagination .ellipsis {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
     }
 } 

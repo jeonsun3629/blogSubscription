@@ -807,18 +807,61 @@ document.addEventListener('DOMContentLoaded', function() {
                     paginationHtml += `<a href="#" class="prev" data-page="${pagination.currentPage - 1}"><i class="fas fa-chevron-left"></i> 이전</a>`;
                 }
                 
-                // 페이지 번호
-                for (let i = 1; i <= pagination.totalPages; i++) {
-                    if (i === pagination.currentPage) {
+                // 페이지네이션 로직 개선 - 최대 10개까지만 보이게
+                const maxVisiblePages = 10;
+                const totalPages = pagination.totalPages;
+                const currentPage = pagination.currentPage;
+                
+                let startPage = 1;
+                let endPage = totalPages;
+                
+                if (totalPages > maxVisiblePages) {
+                    // 현재 페이지를 중심으로 표시할 범위 계산
+                    const halfVisible = Math.floor(maxVisiblePages / 2);
+                    
+                    if (currentPage <= halfVisible) {
+                        // 현재 페이지가 앞쪽에 있을 때
+                        startPage = 1;
+                        endPage = maxVisiblePages;
+                    } else if (currentPage > totalPages - halfVisible) {
+                        // 현재 페이지가 뒤쪽에 있을 때
+                        startPage = totalPages - maxVisiblePages + 1;
+                        endPage = totalPages;
+                    } else {
+                        // 현재 페이지가 중간에 있을 때
+                        startPage = currentPage - halfVisible;
+                        endPage = currentPage + halfVisible;
+                    }
+                }
+                
+                // 첫 페이지가 보이지 않으면 첫 페이지와 ... 추가
+                if (startPage > 1) {
+                    paginationHtml += `<a href="#" data-page="1">1</a>`;
+                    if (startPage > 2) {
+                        paginationHtml += `<span class="ellipsis">...</span>`;
+                    }
+                }
+                
+                // 페이지 번호 생성
+                for (let i = startPage; i <= endPage; i++) {
+                    if (i === currentPage) {
                         paginationHtml += `<a href="#" class="active">${i}</a>`;
                     } else {
                         paginationHtml += `<a href="#" data-page="${i}">${i}</a>`;
                     }
                 }
                 
+                // 마지막 페이지가 보이지 않으면 ... 와 마지막 페이지 추가
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        paginationHtml += `<span class="ellipsis">...</span>`;
+                    }
+                    paginationHtml += `<a href="#" data-page="${totalPages}">${totalPages}</a>`;
+                }
+                
                 // 다음 버튼 - 현재 페이지가 총 페이지 수보다 작을 때만 표시
-                if (pagination.currentPage < pagination.totalPages) {
-                    paginationHtml += `<a href="#" class="next" data-page="${pagination.currentPage + 1}">다음 <i class="fas fa-chevron-right"></i></a>`;
+                if (currentPage < totalPages) {
+                    paginationHtml += `<a href="#" class="next" data-page="${currentPage + 1}">다음 <i class="fas fa-chevron-right"></i></a>`;
                 }
                 
                 paginationHtml += '</div>';
